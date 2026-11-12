@@ -1,4 +1,4 @@
-package com.example.appinspector.ui.theme
+package com.gdvalishvili.appinspector.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

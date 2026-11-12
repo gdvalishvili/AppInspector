@@ -1,4 +1,4 @@
-package com.example.appinspector
+package com.gdvalishvili.appinspector
 
 import org.junit.Test
 

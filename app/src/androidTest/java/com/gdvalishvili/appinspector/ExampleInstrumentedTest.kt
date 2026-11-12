@@ -1,4 +1,4 @@
-package com.example.appinspector
+package com.gdvalishvili.appinspector
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

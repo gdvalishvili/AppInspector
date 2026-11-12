@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.appinspector"
+    namespace = "com.gdvalishvili.appinspector"
     compileSdk {
         version = release(37)
     }

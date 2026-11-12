@@ -1,4 +1,4 @@
-package com.example.appinspector.ui.theme
+package com.gdvalishvili.appinspector.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
