@@ -1,3 +1,73 @@
 <resources>
-    <string name="app_name">AppInspector</string>
+    <string name="app_name" translatable="false">App Inspector</string>
+    <string name="running_in_profile">Private Space copy</string>
+
+    <string name="search_hint">Search: name or package</string>
+    <string name="clear_search">Clear</string>
+
+    <string name="filter_all">All</string>
+    <string name="filter_user">User</string>
+    <string name="filter_system">System</string>
+    <string name="filter_work">Work</string>
+    <string name="chip_with_count">%1$s (%2$d)</string>
+
+    <string name="sort_label">Sort: %1$s</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_installed">Installed</string>
+    <string name="sort_updated">Updated</string>
+    <string name="sort_last_used">Unused first</string>
+
+    <string name="usage_banner_text">Enable “Usage access” to see when apps were last used.</string>
+    <string name="usage_banner_button">Enable</string>
+    <string name="work_paused">Work profile is paused, its apps are hidden.</string>
+
+    <string name="count_shown">Showing %1$d / %2$d</string>
+    <string name="empty_list">No apps found</string>
+
+    <string name="label_installed">Installed</string>
+    <string name="label_updated">Updated</string>
+    <string name="label_last_used">Last used</string>
+
+    <string name="value_dash" translatable="false">—</string>
+    <string name="value_factory">Factory</string>
+    <string name="value_never_updated">Never updated</string>
+    <string name="value_never_opened">Never opened</string>
+    <string name="value_older_than_history">Older than history (2+ years)</string>
+    <string name="value_background">Background app (no icon)</string>
+    <string name="value_no_permission">Usage access required</string>
+
+    <string name="badge_work">Work</string>
+    <string name="badge_system">System</string>
+    <string name="badge_updated_system">System · updated</string>
+    <string name="badge_archived">Archived</string>
+    <string name="badge_background">Background</string>
+    <string name="badge_never_opened">Never opened</string>
+    <string name="badge_stale">90+ days</string>
+    <string name="badge_very_old">2+ years</string>
+
+    <string name="rel_today">Today</string>
+    <string name="rel_yesterday">Yesterday</string>
+    <plurals name="rel_days_ago">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <plurals name="rel_months_ago">
+        <item quantity="one">%1$d month ago</item>
+        <item quantity="other">%1$d months ago</item>
+    </plurals>
+    <plurals name="rel_years_ago">
+        <item quantity="one">%1$d year ago</item>
+        <item quantity="other">%1$d years ago</item>
+    </plurals>
+
+    <string name="error_open_app_info">Couldn\'t open App info</string>
+
+    <!-- Language picker: shown in both languages on purpose -->
+    <string name="lang_dialog_title" translatable="false">ენა / Language</string>
+    <string name="lang_dialog_text" translatable="false">აირჩიე აპის ენა. შეცვლა მოგვიანებით ზედა ღილაკით შეიძლება.\n\nChoose the app language. You can change it later from the top bar.</string>
+    <string name="lang_georgian" translatable="false">ქართული</string>
+    <string name="lang_english" translatable="false">English</string>
+    <string name="lang_short_ka" translatable="false">ქარ</string>
+    <string name="lang_short_en" translatable="false">ENG</string>
+    <string name="sort_recently_used">Recently used</string>
 </resources>

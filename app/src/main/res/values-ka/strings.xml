@@ -1,0 +1,62 @@
+<resources>
+    <string name="running_in_profile">Private Space-ის ასლი</string>
+
+    <string name="search_hint">ძებნა: სახელი ან package</string>
+    <string name="clear_search">გასუფთავება</string>
+
+    <string name="filter_all">ყველა</string>
+    <string name="filter_user">მომხმარებლის</string>
+    <string name="filter_system">სისტემური</string>
+    <string name="filter_work">Work</string>
+    <string name="chip_with_count">%1$s (%2$d)</string>
+
+    <string name="sort_label">დალაგება: %1$s</string>
+    <string name="sort_name">სახელით</string>
+    <string name="sort_installed">დაყენებით</string>
+    <string name="sort_updated">განახლებით</string>
+    <string name="sort_last_used">გამოუყენებელი ზემოთ</string>
+
+    <string name="usage_banner_text">ბოლო გამოყენების სანახავად ჩართე „Usage access“.</string>
+    <string name="usage_banner_button">ჩართვა</string>
+    <string name="work_paused">Work profile დაპაუზებულია, მისი აპები არ ჩანს.</string>
+
+    <string name="count_shown">ნაჩვენებია %1$d / %2$d</string>
+    <string name="empty_list">აპი ვერ მოიძებნა</string>
+
+    <string name="label_installed">დაყენება</string>
+    <string name="label_updated">განახლება</string>
+    <string name="label_last_used">გამოყენება</string>
+
+    <string name="value_factory">ქარხნული</string>
+    <string name="value_never_updated">არ განახლებულა</string>
+    <string name="value_never_opened">არასოდეს გახსნილა</string>
+    <string name="value_older_than_history">ისტორიაზე ძველი (2+ წელი)</string>
+    <string name="value_background">ფონური აპი (ხატულის გარეშე)</string>
+    <string name="value_no_permission">საჭიროა Usage access</string>
+
+    <string name="badge_work">Work</string>
+    <string name="badge_system">სისტემური</string>
+    <string name="badge_updated_system">სისტემური · განახლებული</string>
+    <string name="badge_archived">დაარქივებული</string>
+    <string name="badge_background">ფონური</string>
+    <string name="badge_never_opened">არასოდეს გახსნილა</string>
+    <string name="badge_stale">90+ დღე</string>
+    <string name="badge_very_old">2+ წელი</string>
+
+    <string name="rel_today">დღეს</string>
+    <string name="rel_yesterday">გუშინ</string>
+    <plurals name="rel_days_ago">
+        <item quantity="one">%1$d დღის წინ</item>
+        <item quantity="other">%1$d დღის წინ</item>
+    </plurals>
+    <plurals name="rel_months_ago">
+        <item quantity="one">%1$d თვის წინ</item>
+        <item quantity="other">%1$d თვის წინ</item>
+    </plurals>
+    <plurals name="rel_years_ago">
+        <item quantity="one">%1$d წლის წინ</item>
+        <item quantity="other">%1$d წლის წინ</item>
+    </plurals>
+
+    <string name="error_open_app_info">App info ვერ გაიხსნა</string>
+</resources>
