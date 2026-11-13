@@ -9,17 +9,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
-// UsageEvents.Event type values (stable; literals avoid API-level lint noise)
-private const val EVENT_RESUMED = 1                 // ACTIVITY_RESUMED / MOVE_TO_FOREGROUND
-private const val EVENT_PAUSED = 2                  // ACTIVITY_PAUSED / MOVE_TO_BACKGROUND
-private const val EVENT_SCREEN_NON_INTERACTIVE = 16 // screen off
-private const val EVENT_DEVICE_SHUTDOWN = 26
-
 /**
- * Counts foreground time per app for whole calendar days (00:00-24:00, device time zone)
- * from usage events and stores finished days in daily_usage.
- * Rule: only one app is in the foreground at a time.
- * The launcher is stored too; reports show it as a separate line.
+ * Stores per-app foreground time for whole calendar days (00:00-24:00, device time zone).
+ * The counting itself is in ForegroundCounter (unit-tested).
  */
 class UsageCollector(context: Context) {
 
@@ -53,11 +45,7 @@ class UsageCollector(context: Context) {
         cleanup(today, zone)
     }
 
-    /**
-     * Foreground time per package for one calendar day. Also usable for "today so far".
-     * Open windows are kept as a stack; only the TOP window's app gets time.
-     * When the top window closes, the one below continues (e.g. a game after a small dialog).
-     */
+    /** Foreground time per package for one calendar day. Also usable for "today so far". */
     fun foregroundTimes(day: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Map<String, Long> {
         val start = day.atStartOfDay(zone).toInstant().toEpochMilli()
         val end = minOf(
@@ -65,54 +53,23 @@ class UsageCollector(context: Context) {
             System.currentTimeMillis(),
         )
         if (end <= start) return emptyMap()
-
         // Look a bit before midnight to catch an app that was already open at 00:00
-        val events = usm.queryEvents(start - LOOK_BEHIND_MS, end)
-        val totals = HashMap<String, Long>()
+        return ForegroundCounter.count(readEvents(start - LOOK_BEHIND_MS, end), start, end)
+    }
 
-        // Resumed (not yet paused) activities, in the order they came to the front: (package, activity)
-        val stack = ArrayList<Pair<String, String>>()
-        var topPackage: String? = null
-        var since = 0L
-
-        /** Gives time to the previous top app and starts counting the new top app. */
-        fun updateTop(at: Long) {
-            val newTop = stack.lastOrNull()?.first
-            if (newTop == topPackage) return
-            topPackage?.let { pkg ->
-                val from = maxOf(since, start)
-                val to = minOf(at, end)
-                if (to > from) totals[pkg] = (totals[pkg] ?: 0L) + (to - from)
-            }
-            topPackage = newTop
-            since = at
-        }
-
+    /** Android usage events -> plain list for ForegroundCounter. */
+    private fun readEvents(from: Long, to: Long): List<ForegroundEvent> {
+        val result = ArrayList<ForegroundEvent>()
+        val events = usm.queryEvents(from, to)
         val event = UsageEvents.Event()
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
-            val time = event.timeStamp
             when (event.eventType) {
-                EVENT_SCREEN_NON_INTERACTIVE, EVENT_DEVICE_SHUTDOWN -> {
-                    stack.clear()
-                    updateTop(time)
-                }
-                EVENT_RESUMED -> {
-                    val key = (event.packageName ?: continue) to event.className.orEmpty()
-                    stack.remove(key) // move to the top if it was already open
-                    stack.add(key)
-                    updateTop(time)
-                }
-                EVENT_PAUSED -> {
-                    val key = (event.packageName ?: continue) to event.className.orEmpty()
-                    stack.remove(key)
-                    updateTop(time)
-                }
+                EVENT_RESUMED, EVENT_PAUSED, EVENT_SCREEN_NON_INTERACTIVE, EVENT_DEVICE_SHUTDOWN ->
+                    result += ForegroundEvent(event.timeStamp, event.eventType, event.packageName, event.className)
             }
         }
-        stack.clear()
-        updateTop(end) // close whatever is still open at the end of the window
-        return totals
+        return result
     }
 
     /** Automatic retention: delete history older than the chosen number of years. */

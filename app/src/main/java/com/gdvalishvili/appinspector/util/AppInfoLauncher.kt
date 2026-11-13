@@ -14,9 +14,10 @@ import com.gdvalishvili.appinspector.model.AppProfile
 fun openAppInfo(context: Context, app: AppEntry) {
     try {
         val component = app.component
-        if (app.profile == AppProfile.WORK && component != null) {
+        val user = app.user
+        if (app.profile == AppProfile.WORK && component != null && user != null) {
             context.getSystemService(LauncherApps::class.java)
-                .startAppDetailsActivity(component, app.user, null, null)
+                .startAppDetailsActivity(component, user, null, null)
         } else {
             context.startActivity(
                 Intent(

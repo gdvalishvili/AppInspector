@@ -26,7 +26,7 @@ data class AppEntry(
     val versionName: String?,
     val kind: AppKind,
     val profile: AppProfile,
-    val user: UserHandle,
+    val user: UserHandle?,           // null only in unit tests (Android classes are not available there)
     val component: ComponentName?,   // needed to open App info for work apps
     val installedAt: Long?,          // null = unknown
     val isFactoryInstall: Boolean,   // preinstalled; real install date unknown

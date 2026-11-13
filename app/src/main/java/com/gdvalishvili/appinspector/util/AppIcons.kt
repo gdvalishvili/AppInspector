@@ -20,12 +20,15 @@ object AppIcons {
         cache.get(app.key)?.let { return it }
         val drawable = try {
             when (app.profile) {
-                AppProfile.THIS -> context.packageManager.getApplicationIcon(app.packageName)
-                // Badged icon = icon with the work briefcase
-                AppProfile.WORK -> context.getSystemService(LauncherApps::class.java)
-                    .getActivityList(app.packageName, app.user)
-                    .firstOrNull()
-                    ?.getBadgedIcon(0)
+                AppProfile.WORK -> app.user?.let { user ->
+                    context.getSystemService(LauncherApps::class.java)
+                        .getActivityList(app.packageName, user)
+                        .firstOrNull()
+                        ?.getBadgedIcon(0)
+                }
+                AppProfile.THIS -> {
+                    context.packageManager.getApplicationIcon(app.packageName)
+                }
             }
         } catch (e: Exception) {
             null
