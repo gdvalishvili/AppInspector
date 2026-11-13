@@ -35,6 +35,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
 import java.util.Locale
+import com.gdvalishvili.appinspector.data.UsageCollector
+import com.gdvalishvili.appinspector.work.DailyWorker
 
 data class AppListUiState(
     val isLoading: Boolean = true,
@@ -56,6 +58,12 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     private val history = AppHistoryRepository(application)
     private val settingsStore = SettingsStore(application)
 
+    private val usageCollector = UsageCollector(application)
+
+    init {
+        // Make sure the daily job exists (no-op if already scheduled)
+        DailyWorker.schedule(application)
+    }
     private val snapshot = MutableStateFlow<AppsSnapshot?>(null)
     private val loading = MutableStateFlow(false)
     private var loadJob: Job? = null
@@ -116,6 +124,8 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
                 withContext(Dispatchers.IO) {
                     try {
                         history.sync(snap.apps, snap.workProfile)
+                        // Catch up on missing days even if the daily job was delayed
+                        usageCollector.collectMissingDays()
                     } catch (e: Exception) {
                         // History must never break the main list
                         Log.e("AppInspector", "History sync failed", e)

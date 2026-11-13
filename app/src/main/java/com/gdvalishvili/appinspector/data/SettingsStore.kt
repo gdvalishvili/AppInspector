@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import kotlinx.coroutines.flow.first
 
 enum class SortOrder { NAME, INSTALLED, UPDATED, LAST_USED, RECENTLY_USED }
 
@@ -78,6 +79,19 @@ class SettingsStore(private val context: Context) {
         context.settingsDataStore.edit { it[LANGUAGE_CHOSEN] = value }
     }
 
+    /** Last calendar day (ISO yyyy-MM-dd) whose usage is stored in daily_usage. */
+    suspend fun lastUsageDay(): String? = prefs.first()[LAST_USAGE_DAY]
+
+    suspend fun setLastUsageDay(day: String) {
+        context.settingsDataStore.edit { it[LAST_USAGE_DAY] = day }
+    }
+
+    /** Version of the usage counting rules that produced the stored days. */
+    suspend fun usageAlgorithmVersion(): Int = prefs.first()[USAGE_ALGORITHM_VERSION] ?: 1
+
+    suspend fun setUsageAlgorithmVersion(value: Int) {
+        context.settingsDataStore.edit { it[USAGE_ALGORITHM_VERSION] = value }
+    }
     private companion object {
         val FILTER = stringPreferencesKey("filter")
         val SORT = stringPreferencesKey("sort")
@@ -85,5 +99,7 @@ class SettingsStore(private val context: Context) {
         val SHOW_SOURCE = booleanPreferencesKey("show_source")
         val CATEGORY = intPreferencesKey("category")
         val LANGUAGE_CHOSEN = booleanPreferencesKey("language_chosen")
+        val LAST_USAGE_DAY = stringPreferencesKey("last_usage_day")
+        val USAGE_ALGORITHM_VERSION = intPreferencesKey("usage_algorithm_version")
     }
 }

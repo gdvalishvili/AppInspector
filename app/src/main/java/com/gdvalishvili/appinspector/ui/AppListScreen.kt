@@ -71,6 +71,7 @@ import com.gdvalishvili.appinspector.util.openStorePage
 import androidx.compose.material3.Checkbox
 import com.gdvalishvili.appinspector.data.ListSettings
 import com.gdvalishvili.appinspector.util.categoryTitle
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

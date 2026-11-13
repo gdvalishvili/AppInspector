@@ -94,3 +94,18 @@ internal fun PackageManager.appLabelOrNull(packageName: String): String? = try {
 } catch (e: Exception) {
     null
 }
+
+/** Package of the default home app (launcher), shown as a separate line in reports. */
+internal fun PackageManager.defaultLauncherPackage(): String? {
+    val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+    val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        resolveActivity(
+            intent,
+            PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()),
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    }
+    return info?.activityInfo?.packageName
+}
