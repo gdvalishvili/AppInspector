@@ -53,7 +53,11 @@ class UsageCollector(context: Context) {
         cleanup(today, zone)
     }
 
-    /** Foreground time per package for one calendar day. Also, usable for "today so far". */
+    /**
+     * Foreground time per package for one calendar day. Also usable for "today so far".
+     * Open windows are kept as a stack; only the TOP window's app gets time.
+     * When the top window closes, the one below continues (e.g. a game after a small dialog).
+     */
     fun foregroundTimes(day: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Map<String, Long> {
         val start = day.atStartOfDay(zone).toInstant().toEpochMilli()
         val end = minOf(
@@ -66,17 +70,22 @@ class UsageCollector(context: Context) {
         val events = usm.queryEvents(start - LOOK_BEHIND_MS, end)
         val totals = HashMap<String, Long>()
 
-        var currentPackage: String? = null
-        var currentActivity: String? = null
+        // Resumed (not yet paused) activities, in the order they came to the front: (package, activity)
+        val stack = ArrayList<Pair<String, String>>()
+        var topPackage: String? = null
         var since = 0L
 
-        fun closeCurrent(at: Long) {
-            val pkg = currentPackage ?: return
-            val from = maxOf(since, start)
-            val to = minOf(at, end)
-            if (to > from) totals[pkg] = (totals[pkg] ?: 0L) + (to - from)
-            currentPackage = null
-            currentActivity = null
+        /** Gives time to the previous top app and starts counting the new top app. */
+        fun updateTop(at: Long) {
+            val newTop = stack.lastOrNull()?.first
+            if (newTop == topPackage) return
+            topPackage?.let { pkg ->
+                val from = maxOf(since, start)
+                val to = minOf(at, end)
+                if (to > from) totals[pkg] = (totals[pkg] ?: 0L) + (to - from)
+            }
+            topPackage = newTop
+            since = at
         }
 
         val event = UsageEvents.Event()
@@ -84,28 +93,25 @@ class UsageCollector(context: Context) {
             events.getNextEvent(event)
             val time = event.timeStamp
             when (event.eventType) {
-                EVENT_SCREEN_NON_INTERACTIVE, EVENT_DEVICE_SHUTDOWN -> closeCurrent(time)
-
-                EVENT_RESUMED -> {
-                    val pkg = event.packageName ?: continue
-                    if (pkg != currentPackage) {
-                        // A new app on screen ends the previous one (fixes "stuck" sessions)
-                        closeCurrent(time)
-                        currentPackage = pkg
-                        since = time
-                    }
-                    currentActivity = event.className
+                EVENT_SCREEN_NON_INTERACTIVE, EVENT_DEVICE_SHUTDOWN -> {
+                    stack.clear()
+                    updateTop(time)
                 }
-
+                EVENT_RESUMED -> {
+                    val key = (event.packageName ?: continue) to event.className.orEmpty()
+                    stack.remove(key) // move to the top if it was already open
+                    stack.add(key)
+                    updateTop(time)
+                }
                 EVENT_PAUSED -> {
-                    // Close only when the activity that is on screen pauses
-                    if (event.packageName == currentPackage && event.className == currentActivity) {
-                        closeCurrent(time)
-                    }
+                    val key = (event.packageName ?: continue) to event.className.orEmpty()
+                    stack.remove(key)
+                    updateTop(time)
                 }
             }
         }
-        closeCurrent(end) // still open at the end of the window
+        stack.clear()
+        updateTop(end) // close whatever is still open at the end of the window
         return totals
     }
 
@@ -118,7 +124,7 @@ class UsageCollector(context: Context) {
 
     private companion object {
         /** Increase when counting rules change: stored days get recounted. */
-        const val ALGORITHM_VERSION = 2
+        const val ALGORITHM_VERSION = 3
         const val MAX_BACKFILL_DAYS = 7L
         const val RETENTION_YEARS = 2L
         val LOOK_BEHIND_MS = TimeUnit.HOURS.toMillis(2)
