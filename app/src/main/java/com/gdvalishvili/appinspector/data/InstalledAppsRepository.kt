@@ -31,6 +31,7 @@ class InstalledAppsRepository(context: Context) {
     private fun loadOwnProfile(usage: UsageData?): List<AppEntry> {
         val me = Process.myUserHandle()
         val launcherPackages = pm.launcherPackageNames()
+        val installerLabels = HashMap<String, String?>() // cache: installer package -> label
 
         return pm.installedPackagesCompat().mapNotNull { p ->
             val ai = p.applicationInfo ?: return@mapNotNull null
@@ -42,6 +43,7 @@ class InstalledAppsRepository(context: Context) {
             val updatedAt = p.lastUpdateTime.takeIf { it > 0L && it != p.firstInstallTime }
             val hasLauncher = archived || p.packageName in launcherPackages
             val lastUsed = usage?.lastUsed?.get(p.packageName)?.takeIf { it > 0L }
+            val installer = pm.installerPackageCompat(p.packageName)
 
             AppEntry(
                 key = "THIS:${p.packageName}",
@@ -60,6 +62,12 @@ class InstalledAppsRepository(context: Context) {
                 usageStatus = usageStatusOf(usage, lastUsed, hasLauncher, installedAt),
                 hasLauncher = hasLauncher,
                 isArchived = archived,
+                category = ai.category,
+                installerPackage = installer,
+                installerLabel = installer?.let { inst ->
+                    installerLabels.getOrPut(inst) { pm.appLabelOrNull(inst) }
+                },
+                installSourceKnown = true,
             )
         }
     }

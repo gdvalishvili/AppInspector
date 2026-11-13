@@ -47,13 +47,20 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import com.gdvalishvili.appinspector.model.RemovedApp
 import com.gdvalishvili.appinspector.util.formatDateTime
+import com.gdvalishvili.appinspector.util.categoryTitle
 
 private val ICON_SIZE = 44.dp
 private val STALE_MS = TimeUnit.DAYS.toMillis(90)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppRow(app: AppEntry, now: Long, onClick: () -> Unit) {
+fun AppRow(
+    app: AppEntry,
+    now: Long,
+    showCategory: Boolean,
+    showSource: Boolean,
+    onClick: () -> Unit,
+) {
     Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp)) {
             AppIcon(app)
@@ -80,6 +87,8 @@ fun AppRow(app: AppEntry, now: Long, onClick: () -> Unit) {
                 DateLine(R.string.label_installed, installedText(app))
                 DateLine(R.string.label_updated, updatedText(app))
                 DateLine(R.string.label_last_used, lastUsedText(app, now))
+                if (showCategory) DateLine(R.string.label_category, categoryTitle(app.category))
+                if (showSource) DateLine(R.string.label_source, sourceText(app))
             }
         }
     }
@@ -214,6 +223,19 @@ private fun lastUsedText(app: AppEntry, now: Long): String {
         UsageStatus.BACKGROUND -> stringResource(R.string.value_background)
         UsageStatus.NO_PERMISSION -> stringResource(R.string.value_no_permission)
         UsageStatus.NOT_AVAILABLE -> stringResource(R.string.value_dash)
+    }
+}
+
+@Composable
+private fun sourceText(app: AppEntry): String {
+    val installer = app.installerPackage
+    return when {
+        !app.installSourceKnown -> stringResource(R.string.value_dash)
+        installer == null ->
+            if (app.kind == AppKind.USER) stringResource(R.string.source_unknown)
+            else stringResource(R.string.source_preinstalled)
+        installer == "com.android.shell" -> "ADB"
+        else -> app.installerLabel ?: installer
     }
 }
 

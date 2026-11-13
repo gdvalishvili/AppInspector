@@ -36,6 +36,10 @@ data class AppEntry(
     val usageStatus: UsageStatus,
     val hasLauncher: Boolean,
     val isArchived: Boolean,
+    val category: Int = -1,                    // ApplicationInfo.CATEGORY_* ; -1 = undefined
+    val installerPackage: String? = null,      // who installed it (e.g. com.android.vending)
+    val installerLabel: String? = null,        // human name of the installer, if resolvable
+    val installSourceKnown: Boolean = false,   // false for work apps (not accessible)
 )
 
 /** An app that was removed (from the event journal). */

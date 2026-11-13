@@ -64,6 +64,7 @@ class WorkProfileRepository(private val context: Context) {
             usageStatus = UsageStatus.NOT_AVAILABLE,
             hasLauncher = true,
             isArchived = isArchivedCompat(ai),
+            category = ai.category,
         )
     }
 }

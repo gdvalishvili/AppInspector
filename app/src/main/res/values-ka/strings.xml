@@ -15,7 +15,7 @@
     <string name="sort_installed">დაყენებით</string>
     <string name="sort_updated">განახლებით</string>
     <string name="sort_last_used">გამოუყენებელი ზემოთ</string>
-
+    <string name="sort_recently_used">ბოლოს გამოყენებული</string>
     <string name="usage_banner_text">ბოლო გამოყენების სანახავად ჩართე „Usage access“.</string>
     <string name="usage_banner_button">ჩართვა</string>
     <string name="work_paused">Work profile დაპაუზებულია, მისი აპები არ ჩანს.</string>
@@ -61,4 +61,13 @@
     <string name="error_open_app_info">App info ვერ გაიხსნა</string>
     <string name="filter_removed">წაშლილი</string>
     <string name="label_removed">წაიშალა</string>
+    <string name="view_options">ჩვენების პარამეტრები</string>
+    <string name="show_category">კატეგორიის ჩვენება</string>
+    <string name="show_source">წყაროს ჩვენება</string>
+    <string name="category_all">ყველა კატეგორია</string>
+    <string name="category_undefined">მითითებული არ არის</string>
+    <string name="label_category">კატეგორია</string>
+    <string name="label_source">წყარო</string>
+    <string name="source_preinstalled">ქარხნული</string>
+    <string name="source_unknown">უცნობი</string>
 </resources>

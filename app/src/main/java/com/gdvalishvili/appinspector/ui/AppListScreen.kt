@@ -68,6 +68,9 @@ import com.gdvalishvili.appinspector.util.AppLanguage
 import com.gdvalishvili.appinspector.util.openAppInfo
 import com.gdvalishvili.appinspector.ui.components.RemovedRow
 import com.gdvalishvili.appinspector.util.openStorePage
+import androidx.compose.material3.Checkbox
+import com.gdvalishvili.appinspector.data.ListSettings
+import com.gdvalishvili.appinspector.util.categoryTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,6 +121,11 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                             )
                         }
                     }
+                    ViewOptionsMenu(
+                        settings = state.settings,
+                        onShowCategory = viewModel::setShowCategory,
+                        onShowSource = viewModel::setShowSource,
+                    )
                 },
             )
         }
@@ -136,6 +144,13 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                 showWork = state.workProfile != WorkProfileState.NONE,
                 onFilter = viewModel::setFilter,
             )
+            if (state.settings.showCategory && state.settings.filter != AppFilter.REMOVED) {
+                CategoryRow(
+                    selected = state.settings.category,
+                    counts = state.categoryCounts,
+                    onSelect = viewModel::setCategory,
+                )
+            }
             if (!state.hasUsageAccess) {
                 Spacer(Modifier.height(8.dp))
                 UsageAccessBanner {
@@ -163,7 +178,6 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                SortChip(state.settings.sort, viewModel::setSort)
             }
             val showRemoved = state.settings.filter == AppFilter.REMOVED
             Text(
@@ -189,8 +203,8 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            } else {
-                AppList(state) { app -> openAppInfo(context, app) }
+            } else { AppList(state) { app -> openAppInfo(context, app)
+                }
             }
         }
     }
@@ -220,7 +234,13 @@ private fun AppList(state: AppListUiState, onClick: (AppEntry) -> Unit) {
             }
         } else {
             items(state.apps, key = { it.key }) { app ->
-                AppRow(app = app, now = state.now, onClick = { onClick(app) })
+                AppRow(
+                    app = app,
+                    now = state.now,
+                    showCategory = state.settings.showCategory,
+                    showSource = state.settings.showSource,
+                    onClick = { onClick(app) },
+                )
             }
         }
     }
@@ -375,4 +395,59 @@ private fun LanguageDialog(onChoose: (String) -> Unit) {
             }
         },
     )
+}
+
+/** ⋮ menu with checkable view options. */
+@Composable
+private fun ViewOptionsMenu(
+    settings: ListSettings,
+    onShowCategory: (Boolean) -> Unit,
+    onShowSource: (Boolean) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                painterResource(R.drawable.ic_more_vert),
+                contentDescription = stringResource(R.string.view_options),
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_category)) },
+                onClick = { onShowCategory(!settings.showCategory) },
+                leadingIcon = { Checkbox(checked = settings.showCategory, onCheckedChange = null) },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_source)) },
+                onClick = { onShowSource(!settings.showSource) },
+                leadingIcon = { Checkbox(checked = settings.showSource, onCheckedChange = null) },
+            )
+        }
+    }
+}
+
+/** Single-choice category chips; counts follow the main filter. */
+@Composable
+private fun CategoryRow(selected: Int?, counts: Map<Int, Int>, onSelect: (Int?) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilterChip(
+            selected = selected == null,
+            onClick = { onSelect(null) },
+            label = { Text(stringResource(R.string.category_all)) },
+        )
+        counts.entries.sortedByDescending { it.value }.forEach { (category, count) ->
+            FilterChip(
+                selected = selected == category,
+                onClick = { onSelect(category) },
+                label = { Text(stringResource(R.string.chip_with_count, categoryTitle(category), count)) },
+            )
+        }
+    }
 }

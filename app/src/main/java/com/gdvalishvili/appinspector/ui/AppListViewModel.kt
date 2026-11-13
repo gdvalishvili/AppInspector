@@ -43,6 +43,7 @@ data class AppListUiState(
     val removed: List<RemovedApp> = emptyList(),
     val totalCount: Int = 0,
     val counts: Map<AppFilter, Int> = emptyMap(),
+    val categoryCounts: Map<Int, Int> = emptyMap(),
     val hasUsageAccess: Boolean = true,
     val workProfile: WorkProfileState = WorkProfileState.NONE,
     val settings: ListSettings = ListSettings(),
@@ -92,6 +93,9 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
             counts = AppFilter.entries.associateWith { f ->
                 if (f == AppFilter.REMOVED) removed.size else all.count { it.matches(f) }
             },
+            categoryCounts = all.filter { it.matches(settings.filter) }
+                .groupingBy { it.category }
+                .eachCount(),
             hasUsageAccess = snap?.hasUsageAccess ?: true,
             workProfile = snap?.workProfile ?: WorkProfileState.NONE,
             settings = settings,
@@ -135,6 +139,17 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch { settingsStore.setSort(value) }
     }
 
+    fun setShowCategory(value: Boolean) {
+        viewModelScope.launch { settingsStore.setShowCategory(value) }
+    }
+
+    fun setShowSource(value: Boolean) {
+        viewModelScope.launch { settingsStore.setShowSource(value) }
+    }
+
+    fun setCategory(value: Int?) {
+        viewModelScope.launch { settingsStore.setCategory(value) }
+    }
     fun chooseLanguage(tag: String) {
         viewModelScope.launch {
             settingsStore.setLanguageChosen(true)
@@ -162,6 +177,7 @@ internal fun filterAndSort(all: List<AppEntry>, s: ListSettings, query: String):
     val needle = query.trim()
     val filtered = all.filter { app ->
         app.matches(s.filter) &&
+                (!s.showCategory || s.category == null || app.category == s.category) &&
                 (needle.isEmpty() ||
                         app.label.contains(needle, ignoreCase = true) ||
                         app.packageName.contains(needle, ignoreCase = true))

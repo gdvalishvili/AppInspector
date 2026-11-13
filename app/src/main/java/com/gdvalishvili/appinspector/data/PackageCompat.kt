@@ -74,3 +74,23 @@ internal fun apkFileTime(apkPath: String?): Long? {
 fun isRunningInProfile(context: Context): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
             context.getSystemService(UserManager::class.java).isProfile
+
+/** Package that installed the app (Play Store, file manager, shell...). null = preinstalled/unknown. */
+internal fun PackageManager.installerPackageCompat(packageName: String): String? = try {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        getInstallSourceInfo(packageName).installingPackageName
+    } else {
+        @Suppress("DEPRECATION")
+        getInstallerPackageName(packageName)
+    }
+} catch (e: Exception) {
+    null
+}
+
+/** Human-readable app name for a package, or null if not visible/installed. */
+@Suppress("DEPRECATION")
+internal fun PackageManager.appLabelOrNull(packageName: String): String? = try {
+    getApplicationLabel(getApplicationInfo(packageName, 0)).toString()
+} catch (e: Exception) {
+    null
+}

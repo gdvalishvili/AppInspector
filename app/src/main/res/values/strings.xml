@@ -64,7 +64,7 @@
 
     <!-- Language picker: shown in both languages on purpose -->
     <string name="lang_dialog_title" translatable="false">ენა / Language</string>
-    <string name="lang_dialog_text" translatable="false">აირჩიე აპის ენა. შეცვლა მოგვიანებით ზედა ღილაკით შეიძლება.\n\nChoose the app language. You can change it later from the top bar.</string>
+    <string name="lang_dialog_text" translatable="false">აირჩიე აპის ენა. შეცვლა მოგვიანებით შეიძლება.\n\nChoose the app language. You can change it later.</string>
     <string name="lang_georgian" translatable="false">ქართული</string>
     <string name="lang_english" translatable="false">English</string>
     <string name="lang_short_ka" translatable="false">ქარ</string>
@@ -72,4 +72,13 @@
     <string name="sort_recently_used">Recently used</string>
     <string name="filter_removed">Removed</string>
     <string name="label_removed">Removed</string>
+    <string name="view_options">View options</string>
+    <string name="show_category">Show category</string>
+    <string name="show_source">Show install source</string>
+    <string name="category_all">All categories</string>
+    <string name="category_undefined">Not specified</string>
+    <string name="label_category">Category</string>
+    <string name="label_source">Source</string>
+    <string name="source_preinstalled">Preinstalled</string>
+    <string name="source_unknown">Unknown</string>
 </resources>
