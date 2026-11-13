@@ -14,7 +14,10 @@ private val dateFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.systemDefault())
 
 fun formatDate(epochMs: Long): String = dateFormatter.format(Instant.ofEpochMilli(epochMs))
+private val dateTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").withZone(ZoneId.systemDefault())
 
+fun formatDateTime(epochMs: Long): String = dateTimeFormatter.format(Instant.ofEpochMilli(epochMs))
 @Composable
 fun relativeTime(epochMs: Long, now: Long): String {
     val days = TimeUnit.MILLISECONDS.toDays(now - epochMs).coerceAtLeast(0L).toInt()

@@ -1,6 +1,7 @@
 package com.gdvalishvili.appinspector.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gdvalishvili.appinspector.data.AppFilter
+import com.gdvalishvili.appinspector.data.AppHistoryRepository
 import com.gdvalishvili.appinspector.data.AppsSnapshot
 import com.gdvalishvili.appinspector.data.InstalledAppsRepository
 import com.gdvalishvili.appinspector.data.ListSettings
@@ -18,6 +20,7 @@ import com.gdvalishvili.appinspector.data.isRunningInProfile
 import com.gdvalishvili.appinspector.model.AppEntry
 import com.gdvalishvili.appinspector.model.AppKind
 import com.gdvalishvili.appinspector.model.AppProfile
+import com.gdvalishvili.appinspector.model.RemovedApp
 import com.gdvalishvili.appinspector.model.UsageStatus
 import com.gdvalishvili.appinspector.util.AppLanguage
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +40,7 @@ data class AppListUiState(
     val isLoading: Boolean = true,
     val hasData: Boolean = false,
     val apps: List<AppEntry> = emptyList(),
+    val removed: List<RemovedApp> = emptyList(),
     val totalCount: Int = 0,
     val counts: Map<AppFilter, Int> = emptyMap(),
     val hasUsageAccess: Boolean = true,
@@ -48,6 +52,7 @@ data class AppListUiState(
 class AppListViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = InstalledAppsRepository(application)
+    private val history = AppHistoryRepository(application)
     private val settingsStore = SettingsStore(application)
 
     private val snapshot = MutableStateFlow<AppsSnapshot?>(null)
@@ -69,14 +74,24 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         settingsStore.settings,
         snapshotFlow { query },
         loading,
-    ) { snap, settings, q, isLoading ->
+        history.removals,
+    ) { snap, settings, q, isLoading, removals ->
         val all = snap?.apps.orEmpty()
+        // Hide "removed" entries for apps that were installed again
+        val installedKeys = all.mapTo(HashSet()) { it.key }
+        val removed = removals.filter { it.key !in installedKeys }
+        val showRemoved = settings.filter == AppFilter.REMOVED
+        val needle = q.trim()
+
         AppListUiState(
             isLoading = isLoading,
             hasData = snap != null,
-            apps = filterAndSort(all, settings, q),
+            apps = if (showRemoved) emptyList() else filterAndSort(all, settings, q),
+            removed = if (showRemoved) removed.filter { it.matchesQuery(needle) } else emptyList(),
             totalCount = all.size,
-            counts = AppFilter.entries.associateWith { f -> all.count { it.matches(f) } },
+            counts = AppFilter.entries.associateWith { f ->
+                if (f == AppFilter.REMOVED) removed.size else all.count { it.matches(f) }
+            },
             hasUsageAccess = snap?.hasUsageAccess ?: true,
             workProfile = snap?.workProfile ?: WorkProfileState.NONE,
             settings = settings,
@@ -86,13 +101,22 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         .flowOn(Dispatchers.Default)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppListUiState())
 
-    /** Reloads everything from the system. Called on every return to the app. */
+    /** Reloads from the system and updates the history journal. Called on every return to the app. */
     fun refresh() {
         if (loadJob?.isActive == true) return
         loadJob = viewModelScope.launch {
             loading.value = true
             try {
-                snapshot.value = withContext(Dispatchers.IO) { repository.load() }
+                val snap = withContext(Dispatchers.IO) { repository.load() }
+                snapshot.value = snap
+                withContext(Dispatchers.IO) {
+                    try {
+                        history.sync(snap.apps, snap.workProfile)
+                    } catch (e: Exception) {
+                        // History must never break the main list
+                        Log.e("AppInspector", "History sync failed", e)
+                    }
+                }
             } finally {
                 loading.value = false
             }
@@ -119,13 +143,19 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     }
 }
 
-/** Which apps each filter chip shows. */
+/** Which installed apps each filter chip shows (REMOVED uses the journal instead). */
 internal fun AppEntry.matches(filter: AppFilter): Boolean = when (filter) {
     AppFilter.ALL -> true
     AppFilter.USER -> profile == AppProfile.THIS && kind == AppKind.USER
     AppFilter.SYSTEM -> profile == AppProfile.THIS && kind != AppKind.USER
     AppFilter.WORK -> profile == AppProfile.WORK
+    AppFilter.REMOVED -> false
 }
+
+private fun RemovedApp.matchesQuery(needle: String): Boolean =
+    needle.isEmpty() ||
+            label.contains(needle, ignoreCase = true) ||
+            packageName.contains(needle, ignoreCase = true)
 
 /** SQL analogy: WHERE (filter + search) ORDER BY (selected sort), then name. */
 internal fun filterAndSort(all: List<AppEntry>, s: ListSettings, query: String): List<AppEntry> {

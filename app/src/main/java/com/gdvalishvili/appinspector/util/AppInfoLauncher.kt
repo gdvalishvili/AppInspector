@@ -29,3 +29,14 @@ fun openAppInfo(context: Context, app: AppEntry) {
         Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
     }
 }
+
+/** Opens the Play Store page of a (removed) app; falls back to the web page. */
+fun openStorePage(context: Context, packageName: String) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+    } catch (e: Exception) {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
+        )
+    }
+}

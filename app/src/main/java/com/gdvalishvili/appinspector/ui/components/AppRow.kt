@@ -45,6 +45,8 @@ import com.gdvalishvili.appinspector.util.relativeTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import com.gdvalishvili.appinspector.model.RemovedApp
+import com.gdvalishvili.appinspector.util.formatDateTime
 
 private val ICON_SIZE = 44.dp
 private val STALE_MS = TimeUnit.DAYS.toMillis(90)
@@ -212,5 +214,46 @@ private fun lastUsedText(app: AppEntry, now: Long): String {
         UsageStatus.BACKGROUND -> stringResource(R.string.value_background)
         UsageStatus.NO_PERMISSION -> stringResource(R.string.value_no_permission)
         UsageStatus.NOT_AVAILABLE -> stringResource(R.string.value_dash)
+    }
+}
+
+/** Row for a removed app. Tap opens its Play Store page. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RemovedRow(app: RemovedApp, onClick: () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                text = app.label,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = buildString {
+                    append(app.packageName)
+                    app.versionName?.let { append(" · v").append(it) }
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = scheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (app.profile == AppProfile.WORK) {
+                Row(Modifier.padding(top = 6.dp)) {
+                    Tag(TagSpec(R.string.badge_work, scheme.tertiaryContainer, scheme.onTertiaryContainer))
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+            DateLine(
+                R.string.label_installed,
+                app.installedAt?.let { formatDate(it) } ?: stringResource(R.string.value_dash),
+            )
+            DateLine(
+                R.string.label_removed,
+                (if (app.removedAtApprox) "≈ " else "") + formatDateTime(app.removedAt),
+            )
+        }
     }
 }

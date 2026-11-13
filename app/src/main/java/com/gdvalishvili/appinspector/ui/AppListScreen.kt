@@ -66,6 +66,8 @@ import com.gdvalishvili.appinspector.model.AppEntry
 import com.gdvalishvili.appinspector.ui.components.AppRow
 import com.gdvalishvili.appinspector.util.AppLanguage
 import com.gdvalishvili.appinspector.util.openAppInfo
+import com.gdvalishvili.appinspector.ui.components.RemovedRow
+import com.gdvalishvili.appinspector.util.openStorePage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,6 +165,19 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                 )
                 SortChip(state.settings.sort, viewModel::setSort)
             }
+            val showRemoved = state.settings.filter == AppFilter.REMOVED
+            Text(
+                text = stringResource(
+                    R.string.count_shown,
+                    if (showRemoved) state.removed.size else state.apps.size,
+                    if (showRemoved) state.counts[AppFilter.REMOVED] ?: 0 else state.totalCount,
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            if (!showRemoved) SortChip(state.settings.sort, viewModel::setSort)
+
             // Thin progress bar while refreshing (keeps the old list visible)
             Box(Modifier.fillMaxWidth().height(2.dp)) {
                 if (state.isLoading && state.hasData) {
@@ -183,12 +198,15 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
 
 @Composable
 private fun AppList(state: AppListUiState, onClick: (AppEntry) -> Unit) {
+    val context = LocalContext.current
+    val showRemoved = state.settings.filter == AppFilter.REMOVED
+    val isEmpty = if (showRemoved) state.removed.isEmpty() else state.apps.isEmpty()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (state.apps.isEmpty()) {
+        if (isEmpty) {
             item {
                 Text(
                     text = stringResource(R.string.empty_list),
@@ -196,8 +214,14 @@ private fun AppList(state: AppListUiState, onClick: (AppEntry) -> Unit) {
                 )
             }
         }
-        items(state.apps, key = { it.key }) { app ->
-            AppRow(app = app, now = state.now, onClick = { onClick(app) })
+        if (showRemoved) {
+            items(state.removed, key = { "removed:" + it.key }) { app ->
+                RemovedRow(app = app, onClick = { openStorePage(context, app.packageName) })
+            }
+        } else {
+            items(state.apps, key = { it.key }) { app ->
+                AppRow(app = app, now = state.now, onClick = { onClick(app) })
+            }
         }
     }
 }
@@ -269,6 +293,7 @@ private fun filterLabelRes(filter: AppFilter): Int = when (filter) {
     AppFilter.USER -> R.string.filter_user
     AppFilter.SYSTEM -> R.string.filter_system
     AppFilter.WORK -> R.string.filter_work
+    AppFilter.REMOVED -> R.string.filter_removed
 }
 
 @Composable

@@ -70,4 +70,6 @@
     <string name="lang_short_ka" translatable="false">ქარ</string>
     <string name="lang_short_en" translatable="false">ENG</string>
     <string name="sort_recently_used">Recently used</string>
+    <string name="filter_removed">Removed</string>
+    <string name="label_removed">Removed</string>
 </resources>

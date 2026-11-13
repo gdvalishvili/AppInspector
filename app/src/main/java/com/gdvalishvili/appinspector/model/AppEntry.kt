@@ -37,3 +37,15 @@ data class AppEntry(
     val hasLauncher: Boolean,
     val isArchived: Boolean,
 )
+
+/** An app that was removed (from the event journal). */
+data class RemovedApp(
+    val key: String,              // same format as AppEntry.key: "THIS:pkg" / "WORK:pkg"
+    val packageName: String,
+    val label: String,
+    val versionName: String?,
+    val profile: AppProfile,
+    val installedAt: Long?,
+    val removedAt: Long,
+    val removedAtApprox: Boolean,
+)

@@ -15,8 +15,7 @@ import java.io.IOException
 
 enum class SortOrder { NAME, INSTALLED, UPDATED, LAST_USED, RECENTLY_USED }
 /** Exactly one filter is active at a time. */
-enum class AppFilter { ALL, USER, SYSTEM, WORK }
-
+enum class AppFilter { ALL, USER, SYSTEM, WORK, REMOVED }
 data class ListSettings(
     val filter: AppFilter = AppFilter.USER,
     val sort: SortOrder = SortOrder.NAME,
