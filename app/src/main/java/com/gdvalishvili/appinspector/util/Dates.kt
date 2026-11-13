@@ -29,3 +29,12 @@ fun relativeTime(epochMs: Long, now: Long): String {
         else -> (days / 365).let { pluralStringResource(R.plurals.rel_years_ago, it, it) }
     }
 }
+
+@Composable
+fun formatDuration(ms: Long): String {
+    val totalMinutes = ms / 60_000L
+    val hours = (totalMinutes / 60).toInt()
+    val minutes = (totalMinutes % 60).toInt()
+    return if (hours > 0) stringResource(R.string.duration_hm, hours, minutes)
+    else stringResource(R.string.duration_m, minutes)
+}

@@ -71,11 +71,10 @@ import com.gdvalishvili.appinspector.util.openStorePage
 import androidx.compose.material3.Checkbox
 import com.gdvalishvili.appinspector.data.ListSettings
 import com.gdvalishvili.appinspector.util.categoryTitle
-import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
+fun AppListScreen(onOpenReport: () -> Unit, viewModel: AppListViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val languageChosen by viewModel.languageChosen.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -108,6 +107,12 @@ fun AppListScreen(viewModel: AppListViewModel = viewModel()) {
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenReport) {
+                    Icon(
+                        painterResource(R.drawable.ic_bar_chart),
+                        contentDescription = stringResource(R.string.report_title),
+                    )
+                }
                     if (AppLanguage.isSupported()) {
                         val toGeorgian = currentLanguage != AppLanguage.GEORGIAN
                         TextButton(onClick = {

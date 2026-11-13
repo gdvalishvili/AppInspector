@@ -81,4 +81,24 @@
     <string name="label_source">Source</string>
     <string name="source_preinstalled">Preinstalled</string>
     <string name="source_unknown">Unknown</string>
+    <string name="report_title">Report</string>
+    <string name="back">Back</string>
+    <string name="period_day">Day</string>
+    <string name="period_week">Week</string>
+    <string name="period_month">Month</string>
+    <string name="report_screen_time">Screen time</string>
+    <string name="report_daily_average">Daily average: %1$s</string>
+    <string name="report_vs_previous">Compared with previous: %1$s</string>
+    <string name="report_launcher">Home screen (not in total): %1$s</string>
+    <string name="report_no_data">No data for this period</string>
+    <string name="report_sort_time">By time</string>
+    <string name="report_sort_name">By name</string>
+    <string name="report_changes">Changes</string>
+    <string name="changes_installed">Installed (%1$d)</string>
+    <string name="changes_updated">Updated (%1$d)</string>
+    <string name="changes_removed">Removed (%1$d)</string>
+    <string name="duration_hm">%1$dh %2$dm</string>
+    <string name="duration_m">%1$dm</string>
+    <string name="date_pick_ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

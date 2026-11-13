@@ -70,4 +70,24 @@
     <string name="label_source">წყარო</string>
     <string name="source_preinstalled">ქარხნული</string>
     <string name="source_unknown">უცნობი</string>
+    <string name="report_title">რეპორტი</string>
+    <string name="back">უკან</string>
+    <string name="period_day">დღე</string>
+    <string name="period_week">კვირა</string>
+    <string name="period_month">თვე</string>
+    <string name="report_screen_time">ეკრანთან</string>
+    <string name="report_daily_average">საშუალოდ დღეში: %1$s</string>
+    <string name="report_vs_previous">წინა პერიოდთან: %1$s</string>
+    <string name="report_launcher">მთავარი ეკრანი (ჯამში არ შედის): %1$s</string>
+    <string name="report_no_data">ამ პერიოდზე მონაცემი არ არის</string>
+    <string name="report_sort_time">დროით</string>
+    <string name="report_sort_name">სახელით</string>
+    <string name="report_changes">ცვლილებები</string>
+    <string name="changes_installed">დაყენდა (%1$d)</string>
+    <string name="changes_updated">განახლდა (%1$d)</string>
+    <string name="changes_removed">წაიშალა (%1$d)</string>
+    <string name="duration_hm">%1$dსთ %2$dწთ</string>
+    <string name="duration_m">%1$dწთ</string>
+    <string name="date_pick_ok">არჩევა</string>
+    <string name="cancel">გაუქმება</string>
 </resources>

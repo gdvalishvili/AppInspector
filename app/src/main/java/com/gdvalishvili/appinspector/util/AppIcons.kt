@@ -35,4 +35,16 @@ object AppIcons {
         cache.put(app.key, bitmap)
         return bitmap
     }
+
+    /** Icon of an app in this profile, by package name (used in reports). */
+    fun loadForPackage(context: Context, packageName: String, sizePx: Int): ImageBitmap? {
+        val key = "THIS:$packageName" // same key format as AppEntry.key -> shared cache
+        cache.get(key)?.let { return it }
+        val drawable = try {
+            context.packageManager.getApplicationIcon(packageName)
+        } catch (e: Exception) {
+            null
+        } ?: return null
+        return drawable.toBitmap(sizePx, sizePx).asImageBitmap().also { cache.put(key, it) }
+    }
 }
