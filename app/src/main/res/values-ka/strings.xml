@@ -90,4 +90,35 @@
     <string name="duration_m">%1$dწთ</string>
     <string name="date_pick_ok">არჩევა</string>
     <string name="cancel">გაუქმება</string>
+    <string name="settings_title">პარამეტრები</string>
+    <string name="settings_reports">რეპორტები (შეტყობინება)</string>
+    <string name="settings_daily">დღიური რეპორტი</string>
+    <string name="settings_daily_desc">წინა დღის შესახებ</string>
+    <string name="settings_weekly">კვირეული რეპორტი</string>
+    <string name="settings_weekly_desc">ორშაბათს, გასული კვირის შესახებ</string>
+    <string name="settings_monthly">თვიური რეპორტი</string>
+    <string name="settings_monthly_desc">თვის 1-ში, გასული თვის შესახებ</string>
+    <string name="settings_time">დრო</string>
+    <string name="settings_time_desc">დაახლოებით (±30 წთ)</string>
+    <string name="settings_send_now">რეპორტის ნახვა ახლა</string>
+    <string name="settings_notif_blocked">ამ აპისთვის შეტყობინებები დაბლოკილია.</string>
+    <string name="settings_notif_allow">დაშვება</string>
+    <string name="settings_data">მონაცემები</string>
+    <string name="settings_retention">ისტორიის შენახვა</string>
+    <plurals name="years_count">
+        <item quantity="one">%1$d წელი</item>
+        <item quantity="other">%1$d წელი</item>
+    </plurals>
+    <string name="settings_usage_access">Usage access</string>
+    <string name="settings_on">ჩართულია ✔</string>
+    <string name="settings_off">გამორთულია</string>
+    <string name="settings_about">შესახებ</string>
+    <string name="settings_version">ვერსია %1$s</string>
+    <string name="channel_reports">რეპორტები</string>
+    <string name="channel_reports_desc">დღიური, კვირეული და თვიური რეპორტები</string>
+    <string name="notif_title">App Inspector · რეპორტი</string>
+    <string name="notif_yesterday">გუშინ: %1$s</string>
+    <string name="notif_week">გასული კვირა: %1$s (საშ. %2$s)</string>
+    <string name="notif_month">გასული თვე: %1$s (საშ. %2$s)</string>
+    <string name="notif_changes"> · +%1$d / −%2$d აპი</string>
 </resources>

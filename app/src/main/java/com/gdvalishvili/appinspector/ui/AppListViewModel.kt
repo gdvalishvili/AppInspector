@@ -61,8 +61,11 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     private val usageCollector = UsageCollector(application)
 
     init {
-        // Make sure the daily job exists (no-op if already scheduled)
-        DailyWorker.schedule(application)
+        // Make sure the daily job exists, at the chosen time (no-op if already scheduled)
+        viewModelScope.launch {
+            val rs = settingsStore.reportSettingsNow()
+            DailyWorker.schedule(application, rs.hour, rs.minute, replace = false)
+        }
     }
     private val snapshot = MutableStateFlow<AppsSnapshot?>(null)
     private val loading = MutableStateFlow(false)

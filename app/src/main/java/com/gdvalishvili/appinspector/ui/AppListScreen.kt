@@ -71,10 +71,15 @@ import com.gdvalishvili.appinspector.util.openStorePage
 import androidx.compose.material3.Checkbox
 import com.gdvalishvili.appinspector.data.ListSettings
 import com.gdvalishvili.appinspector.util.categoryTitle
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppListScreen(onOpenReport: () -> Unit, viewModel: AppListViewModel = viewModel()) {
+fun AppListScreen(
+    onOpenReport: () -> Unit,
+    onOpenSettings: () -> Unit,
+    viewModel: AppListViewModel = viewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val languageChosen by viewModel.languageChosen.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -131,6 +136,7 @@ fun AppListScreen(onOpenReport: () -> Unit, viewModel: AppListViewModel = viewMo
                         settings = state.settings,
                         onShowCategory = viewModel::setShowCategory,
                         onShowSource = viewModel::setShowSource,
+                        onOpenSettings = onOpenSettings,
                     )
                 },
             )
@@ -409,6 +415,7 @@ private fun ViewOptionsMenu(
     settings: ListSettings,
     onShowCategory: (Boolean) -> Unit,
     onShowSource: (Boolean) -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -428,6 +435,14 @@ private fun ViewOptionsMenu(
                 text = { Text(stringResource(R.string.show_source)) },
                 onClick = { onShowSource(!settings.showSource) },
                 leadingIcon = { Checkbox(checked = settings.showSource, onCheckedChange = null) },
+            )
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.settings_title)) },
+                onClick = {
+                    expanded = false
+                    onOpenSettings()
+                },
             )
         }
     }

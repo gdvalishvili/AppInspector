@@ -9,11 +9,14 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.gdvalishvili.appinspector.model.Period
+import com.gdvalishvili.appinspector.model.PeriodType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 
 enum class SortOrder { NAME, INSTALLED, UPDATED, LAST_USED, RECENTLY_USED }
 
@@ -28,13 +31,24 @@ data class ListSettings(
     val category: Int? = null,          // null = all categories
 )
 
+data class ReportSettings(
+    val daily: Boolean = false,
+    val weekly: Boolean = false,
+    val monthly: Boolean = false,
+    val hour: Int = 9,
+    val minute: Int = 0,
+    val retentionYears: Int = 2,
+)
+
 private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-/** Remembers view settings and "language already chosen" between launches. */
+/** All small settings of the app (key-value). */
 class SettingsStore(private val context: Context) {
 
     private val prefs: Flow<Preferences> = context.settingsDataStore.data
         .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
+
+    // ---------- List view ----------
 
     val settings: Flow<ListSettings> = prefs.map { p ->
         ListSettings(
@@ -47,8 +61,6 @@ class SettingsStore(private val context: Context) {
             category = p[CATEGORY],
         )
     }
-
-    val languageChosen: Flow<Boolean> = prefs.map { it[LANGUAGE_CHOSEN] ?: false }
 
     suspend fun setFilter(value: AppFilter) {
         context.settingsDataStore.edit { it[FILTER] = value.name }
@@ -75,9 +87,76 @@ class SettingsStore(private val context: Context) {
         }
     }
 
+    // ---------- Language ----------
+
+    val languageChosen: Flow<Boolean> = prefs.map { it[LANGUAGE_CHOSEN] ?: false }
+
     suspend fun setLanguageChosen(value: Boolean) {
         context.settingsDataStore.edit { it[LANGUAGE_CHOSEN] = value }
     }
+
+    // ---------- Reports ----------
+
+    val reportSettings: Flow<ReportSettings> = prefs.map { p ->
+        ReportSettings(
+            daily = p[REPORT_DAILY] ?: false,
+            weekly = p[REPORT_WEEKLY] ?: false,
+            monthly = p[REPORT_MONTHLY] ?: false,
+            hour = p[REPORT_HOUR] ?: 9,
+            minute = p[REPORT_MINUTE] ?: 0,
+            retentionYears = p[RETENTION_YEARS] ?: 2,
+        )
+    }
+
+    suspend fun reportSettingsNow(): ReportSettings = reportSettings.first()
+
+    /** Enabling marks the last finished period as "sent": the first report comes at the next period. */
+    suspend fun setReportDaily(value: Boolean) {
+        context.settingsDataStore.edit {
+            it[REPORT_DAILY] = value
+            if (value) it[LAST_SENT_DAY] = LocalDate.now().minusDays(1).toString()
+        }
+    }
+
+    suspend fun setReportWeekly(value: Boolean) {
+        context.settingsDataStore.edit {
+            it[REPORT_WEEKLY] = value
+            if (value) it[LAST_SENT_WEEK] = Period.of(PeriodType.WEEK, LocalDate.now()).previous().start.toString()
+        }
+    }
+
+    suspend fun setReportMonthly(value: Boolean) {
+        context.settingsDataStore.edit {
+            it[REPORT_MONTHLY] = value
+            if (value) it[LAST_SENT_MONTH] = Period.of(PeriodType.MONTH, LocalDate.now()).previous().start.toString()
+        }
+    }
+
+    suspend fun setReportTime(hour: Int, minute: Int) {
+        context.settingsDataStore.edit {
+            it[REPORT_HOUR] = hour
+            it[REPORT_MINUTE] = minute
+        }
+    }
+
+    suspend fun setRetentionYears(value: Int) {
+        context.settingsDataStore.edit { it[RETENTION_YEARS] = value }
+    }
+
+    /** Start date (ISO) of the last period whose report was sent, per period type. */
+    suspend fun lastSent(type: PeriodType): String? = prefs.first()[lastSentKey(type)]
+
+    suspend fun setLastSent(type: PeriodType, start: LocalDate) {
+        context.settingsDataStore.edit { it[lastSentKey(type)] = start.toString() }
+    }
+
+    private fun lastSentKey(type: PeriodType) = when (type) {
+        PeriodType.DAY -> LAST_SENT_DAY
+        PeriodType.WEEK -> LAST_SENT_WEEK
+        PeriodType.MONTH -> LAST_SENT_MONTH
+    }
+
+    // ---------- Usage collection ----------
 
     /** Last calendar day (ISO yyyy-MM-dd) whose usage is stored in daily_usage. */
     suspend fun lastUsageDay(): String? = prefs.first()[LAST_USAGE_DAY]
@@ -92,6 +171,7 @@ class SettingsStore(private val context: Context) {
     suspend fun setUsageAlgorithmVersion(value: Int) {
         context.settingsDataStore.edit { it[USAGE_ALGORITHM_VERSION] = value }
     }
+
     private companion object {
         val FILTER = stringPreferencesKey("filter")
         val SORT = stringPreferencesKey("sort")
@@ -99,6 +179,15 @@ class SettingsStore(private val context: Context) {
         val SHOW_SOURCE = booleanPreferencesKey("show_source")
         val CATEGORY = intPreferencesKey("category")
         val LANGUAGE_CHOSEN = booleanPreferencesKey("language_chosen")
+        val REPORT_DAILY = booleanPreferencesKey("report_daily")
+        val REPORT_WEEKLY = booleanPreferencesKey("report_weekly")
+        val REPORT_MONTHLY = booleanPreferencesKey("report_monthly")
+        val REPORT_HOUR = intPreferencesKey("report_hour")
+        val REPORT_MINUTE = intPreferencesKey("report_minute")
+        val RETENTION_YEARS = intPreferencesKey("retention_years")
+        val LAST_SENT_DAY = stringPreferencesKey("last_sent_day")
+        val LAST_SENT_WEEK = stringPreferencesKey("last_sent_week")
+        val LAST_SENT_MONTH = stringPreferencesKey("last_sent_month")
         val LAST_USAGE_DAY = stringPreferencesKey("last_usage_day")
         val USAGE_ALGORITHM_VERSION = intPreferencesKey("usage_algorithm_version")
     }

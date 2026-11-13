@@ -38,3 +38,12 @@ fun formatDuration(ms: Long): String {
     return if (hours > 0) stringResource(R.string.duration_hm, hours, minutes)
     else stringResource(R.string.duration_m, minutes)
 }
+
+/** Same as formatDuration, for code outside Compose (notifications). */
+fun formatDurationText(context: android.content.Context, ms: Long): String {
+    val totalMinutes = ms / 60_000L
+    val hours = (totalMinutes / 60).toInt()
+    val minutes = (totalMinutes % 60).toInt()
+    return if (hours > 0) context.getString(R.string.duration_hm, hours, minutes)
+    else context.getString(R.string.duration_m, minutes)
+}

@@ -72,14 +72,28 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportScreen(onBack: () -> Unit, viewModel: ReportViewModel = viewModel()) {
+fun ReportScreen(
+    onBack: () -> Unit,
+    requestedPeriod: Period? = null,
+    onRequestHandled: () -> Unit = {},
+    viewModel: ReportViewModel = viewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalConfiguration.current.locales[0]
     var showPicker by remember { mutableStateOf(false) }
+
+    // Opened from a notification: show that period
+    LaunchedEffect(requestedPeriod) {
+        if (requestedPeriod != null) {
+            viewModel.open(requestedPeriod)
+            onRequestHandled()
+        }
+    }
 
     // Reload when returning to the screen (today's numbers keep growing)
     LifecycleResumeEffect(Unit) {

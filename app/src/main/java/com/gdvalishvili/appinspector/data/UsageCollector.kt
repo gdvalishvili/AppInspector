@@ -115,9 +115,10 @@ class UsageCollector(context: Context) {
         return totals
     }
 
-    /** Automatic retention: delete history older than RETENTION_YEARS. */
+    /** Automatic retention: delete history older than the chosen number of years. */
     private suspend fun cleanup(today: LocalDate, zone: ZoneId) {
-        val minDay = today.minusYears(RETENTION_YEARS)
+        val years = settings.reportSettingsNow().retentionYears.toLong()
+        val minDay = today.minusYears(years)
         usageDao.deleteUsageOlderThan(minDay.toString())
         usageDao.deleteEventsOlderThan(minDay.atStartOfDay(zone).toInstant().toEpochMilli())
     }
@@ -126,7 +127,6 @@ class UsageCollector(context: Context) {
         /** Increase when counting rules change: stored days get recounted. */
         const val ALGORITHM_VERSION = 3
         const val MAX_BACKFILL_DAYS = 7L
-        const val RETENTION_YEARS = 2L
         val LOOK_BEHIND_MS = TimeUnit.HOURS.toMillis(2)
     }
 }

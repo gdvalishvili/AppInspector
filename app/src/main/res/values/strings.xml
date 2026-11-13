@@ -101,4 +101,35 @@
     <string name="duration_m">%1$dm</string>
     <string name="date_pick_ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_reports">Reports (notifications)</string>
+    <string name="settings_daily">Daily report</string>
+    <string name="settings_daily_desc">About the previous day</string>
+    <string name="settings_weekly">Weekly report</string>
+    <string name="settings_weekly_desc">On Mondays, about last week</string>
+    <string name="settings_monthly">Monthly report</string>
+    <string name="settings_monthly_desc">On the 1st, about last month</string>
+    <string name="settings_time">Time</string>
+    <string name="settings_time_desc">Approximate (±30 min)</string>
+    <string name="settings_send_now">Show report now</string>
+    <string name="settings_notif_blocked">Notifications are blocked for this app.</string>
+    <string name="settings_notif_allow">Allow</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_retention">Keep history</string>
+    <plurals name="years_count">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+    <string name="settings_usage_access">Usage access</string>
+    <string name="settings_on">On ✔</string>
+    <string name="settings_off">Off</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="channel_reports">Reports</string>
+    <string name="channel_reports_desc">Daily, weekly and monthly usage reports</string>
+    <string name="notif_title">App Inspector report</string>
+    <string name="notif_yesterday">Yesterday: %1$s</string>
+    <string name="notif_week">Last week: %1$s (avg %2$s)</string>
+    <string name="notif_month">Last month: %1$s (avg %2$s)</string>
+    <string name="notif_changes"> · +%1$d / −%2$d apps</string>
 </resources>
