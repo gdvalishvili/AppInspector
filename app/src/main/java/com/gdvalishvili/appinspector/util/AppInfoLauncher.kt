@@ -9,6 +9,8 @@ import android.widget.Toast
 import com.gdvalishvili.appinspector.R
 import com.gdvalishvili.appinspector.model.AppEntry
 import com.gdvalishvili.appinspector.model.AppProfile
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
 
 /** Opens the system "App info" screen; work apps go through LauncherApps (verified in spike). */
 fun openAppInfo(context: Context, app: AppEntry) {
@@ -74,4 +76,31 @@ fun openPlayStoreApp(context: Context) {
     } catch (e: Exception) {
         Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
     }
+}
+
+private const val PLAY_PACKAGE = "com.android.vending"
+private const val PLAY_MY_APPS_ACTION = "com.google.android.finsky.VIEW_MY_DOWNLOADS"
+private const val PLAY_MAIN_ACTIVITY = "com.google.android.finsky.activities.MainActivity"
+
+/**
+ * Opens Play Store's "Manage apps & device" page.
+ * Unofficial intent (verified with adb on Pixel). It may break after a Play update,
+ * so we fall back to simply opening the Play Store.
+ */
+fun openPlayUpdates(context: Context) {
+    val candidates = listOf(
+        Intent(PLAY_MY_APPS_ACTION).setComponent(ComponentName(PLAY_PACKAGE, PLAY_MAIN_ACTIVITY)),
+        Intent(PLAY_MY_APPS_ACTION).setPackage(PLAY_PACKAGE),
+    )
+    for (intent in candidates) {
+        try {
+            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            return
+        } catch (e: ActivityNotFoundException) {
+            // try next
+        } catch (e: SecurityException) {
+            // try next
+        }
+    }
+    openPlayStoreApp(context)
 }

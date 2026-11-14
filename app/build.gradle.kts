@@ -23,8 +23,8 @@ android {
         applicationId = "com.gdvalishvili.appinspector"
         minSdk = 26
         targetSdk = 37
-        versionCode = 10
-        versionName = "3.0.0-alpha2"
+        versionCode = 12
+        versionName = "3.0.0-alpha3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

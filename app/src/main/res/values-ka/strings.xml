@@ -148,7 +148,6 @@
     <string name="action_uninstall">წაშლა</string>
     <string name="updates_title">განახლებები</string>
     <string name="updates_tip">Play აპებს ძირითადად Wi-Fi-ზე, დატენვისას და უმოქმედობისას აახლებს. სია აჩვენებს, რამდენი ხნის წინ განახლდა აპი, და არა იმას, მოსულია თუ არა განახლება.</string>
-    <string name="updates_open_play">Play Store-ის გახსნა</string>
     <string name="updates_recent">ბოლო 7 დღეში განახლდა: %1$d</string>
     <string name="updates_all">ყველა (%1$d)</string>
     <string name="updates_30">30+ დღე (%1$d)</string>
@@ -158,4 +157,9 @@
         <item quantity="one">%1$d დღე</item>
         <item quantity="other">%1$d დღე</item>
     </plurals>
+    <string name="updates_open_play">Play-ის განახლებები</string>
+    <string name="updates_sort_oldest">ძველი განახლება</string>
+    <string name="updates_sort_newest">ახალი განახლება</string>
+    <string name="updates_sort_name">სახელი</string>
+    <string name="updates_sort_used">ხშირად გამოყენებული (7 დღე)</string>
 </resources>

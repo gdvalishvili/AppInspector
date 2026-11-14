@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                 // Shared with AppListScreen (same Activity -> same instance)
                 val listViewModel: AppListViewModel = viewModel()
                 val allApps by listViewModel.allApps.collectAsStateWithLifecycle()
-
+                val listStateForUpdates by listViewModel.uiState.collectAsStateWithLifecycle()
                 var screen by rememberSaveable { mutableStateOf(Screen.LIST) }
                 var detailsKey by rememberSaveable { mutableStateOf<String?>(null) }
                 var detailsReturn by rememberSaveable { mutableStateOf(Screen.LIST) }
@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
                         BackHandler { screen = Screen.LIST }
                         UpdatesScreen(
                             apps = allApps,
+                            weekUsage = listStateForUpdates.weekUsage,
                             onBack = { screen = Screen.LIST },
                             onOpenDetails = { key -> openDetails(key, Screen.UPDATES) },
                             onRefreshList = listViewModel::refresh,
