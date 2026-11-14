@@ -157,4 +157,16 @@
     <string name="action_app_info">App info</string>
     <string name="action_store">Play Store</string>
     <string name="action_uninstall">Uninstall</string>
+    <string name="updates_title">Updates</string>
+    <string name="updates_tip">Play usually updates apps on Wi-Fi, while charging and when the phone is idle. This list shows how long ago each app was updated, not whether an update is available.</string>
+    <string name="updates_open_play">Open Play Store</string>
+    <string name="updates_recent">Updated in the last 7 days: %1$d</string>
+    <string name="updates_all">All (%1$d)</string>
+    <string name="updates_30">30+ days (%1$d)</string>
+    <string name="updates_90">90+ days (%1$d)</string>
+    <string name="updates_empty">No apps from Play in this group</string>
+    <plurals name="updates_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
 </resources>

@@ -28,9 +28,10 @@ import com.gdvalishvili.appinspector.ui.report.ReportScreen
 import com.gdvalishvili.appinspector.ui.settings.SettingsScreen
 import com.gdvalishvili.appinspector.ui.theme.AppInspectorTheme
 import java.time.LocalDate
+import com.gdvalishvili.appinspector.ui.updates.UpdatesScreen
 
 /** Simple state-based navigation (no navigation library needed). */
-enum class Screen { LIST, REPORT, SETTINGS, DETAILS }
+enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES }
 
 class MainActivity : ComponentActivity() {
 
@@ -69,6 +70,7 @@ class MainActivity : ComponentActivity() {
                         onOpenSettings = { screen = Screen.SETTINGS },
                         onOpenDetails = { key -> openDetails(key, Screen.LIST) },
                         viewModel = listViewModel,
+                        onOpenUpdates = { screen = Screen.UPDATES },
                     )
                     Screen.REPORT -> {
                         BackHandler { screen = Screen.LIST }
@@ -82,6 +84,15 @@ class MainActivity : ComponentActivity() {
                     Screen.SETTINGS -> {
                         BackHandler { screen = Screen.LIST }
                         SettingsScreen(onBack = { screen = Screen.LIST })
+                    }
+                    Screen.UPDATES -> {
+                        BackHandler { screen = Screen.LIST }
+                        UpdatesScreen(
+                            apps = allApps,
+                            onBack = { screen = Screen.LIST },
+                            onOpenDetails = { key -> openDetails(key, Screen.UPDATES) },
+                            onRefreshList = listViewModel::refresh,
+                        )
                     }
                     Screen.DETAILS -> {
                         BackHandler { screen = detailsReturn }

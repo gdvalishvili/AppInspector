@@ -64,3 +64,14 @@ fun requestUninstall(context: Context, packageName: String) {
         Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
     }
 }
+
+/** Opens the Play Store app itself (Manage apps → Updates is one tap from there). */
+fun openPlayStoreApp(context: Context) {
+    val intent = context.packageManager.getLaunchIntentForPackage("com.android.vending")
+    try {
+        if (intent != null) context.startActivity(intent)
+        else Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
+    } catch (e: Exception) {
+        Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
+    }
+}

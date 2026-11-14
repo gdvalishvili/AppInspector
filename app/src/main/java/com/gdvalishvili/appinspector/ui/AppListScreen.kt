@@ -80,6 +80,7 @@ fun AppListScreen(
     onOpenReport: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenDetails: (String) -> Unit,
+    onOpenUpdates: () -> Unit,
     viewModel: AppListViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -141,6 +142,7 @@ fun AppListScreen(
                         onShowSize = viewModel::setShowSize,
                         onShowDescription = viewModel::setShowDescription,
                         onOpenSettings = onOpenSettings,
+                        onOpenUpdates = onOpenUpdates,
                     )
                 },
             )
@@ -420,6 +422,7 @@ private fun ViewOptionsMenu(
     onShowSize: (Boolean) -> Unit,
     onShowDescription: (Boolean) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenUpdates: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -451,6 +454,13 @@ private fun ViewOptionsMenu(
                 leadingIcon = { Checkbox(checked = settings.showDescription, onCheckedChange = null) },
             )
             HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.updates_title)) },
+                onClick = {
+                    expanded = false
+                    onOpenUpdates()
+                },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.settings_title)) },
                 onClick = {
