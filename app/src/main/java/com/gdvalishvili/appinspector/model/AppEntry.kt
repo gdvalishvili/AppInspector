@@ -53,3 +53,8 @@ data class RemovedApp(
     val removedAt: Long,
     val removedAtApprox: Boolean,
 )
+
+/** Storage used by an app. dataBytes already includes cacheBytes. */
+data class AppSize(val appBytes: Long, val dataBytes: Long, val cacheBytes: Long) {
+    val total: Long get() = appBytes + dataBytes
+}

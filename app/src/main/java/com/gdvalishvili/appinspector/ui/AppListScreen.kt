@@ -27,11 +27,13 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -60,24 +62,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gdvalishvili.appinspector.R
 import com.gdvalishvili.appinspector.data.AppFilter
+import com.gdvalishvili.appinspector.data.ListSettings
 import com.gdvalishvili.appinspector.data.SortOrder
 import com.gdvalishvili.appinspector.data.WorkProfileState
 import com.gdvalishvili.appinspector.model.AppEntry
+import com.gdvalishvili.appinspector.model.AppProfile
 import com.gdvalishvili.appinspector.ui.components.AppRow
-import com.gdvalishvili.appinspector.util.AppLanguage
-import com.gdvalishvili.appinspector.util.openAppInfo
 import com.gdvalishvili.appinspector.ui.components.RemovedRow
-import com.gdvalishvili.appinspector.util.openStorePage
-import androidx.compose.material3.Checkbox
-import com.gdvalishvili.appinspector.data.ListSettings
+import com.gdvalishvili.appinspector.util.AppLanguage
 import com.gdvalishvili.appinspector.util.categoryTitle
-import androidx.compose.material3.HorizontalDivider
+import com.gdvalishvili.appinspector.util.openAppInfo
+import com.gdvalishvili.appinspector.util.openStorePage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppListScreen(
     onOpenReport: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenDetails: (String) -> Unit,
     viewModel: AppListViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -113,11 +115,11 @@ fun AppListScreen(
                 },
                 actions = {
                     IconButton(onClick = onOpenReport) {
-                    Icon(
-                        painterResource(R.drawable.ic_bar_chart),
-                        contentDescription = stringResource(R.string.report_title),
-                    )
-                }
+                        Icon(
+                            painterResource(R.drawable.ic_bar_chart),
+                            contentDescription = stringResource(R.string.report_title),
+                        )
+                    }
                     if (AppLanguage.isSupported()) {
                         val toGeorgian = currentLanguage != AppLanguage.GEORGIAN
                         TextButton(onClick = {
@@ -136,6 +138,8 @@ fun AppListScreen(
                         settings = state.settings,
                         onShowCategory = viewModel::setShowCategory,
                         onShowSource = viewModel::setShowSource,
+                        onShowSize = viewModel::setShowSize,
+                        onShowDescription = viewModel::setShowDescription,
                         onOpenSettings = onOpenSettings,
                     )
                 },
@@ -184,26 +188,19 @@ fun AppListScreen(
                     .padding(top = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val showRemoved = state.settings.filter == AppFilter.REMOVED
                 Text(
-                    text = stringResource(R.string.count_shown, state.apps.size, state.totalCount),
+                    text = stringResource(
+                        R.string.count_shown,
+                        if (showRemoved) state.removed.size else state.apps.size,
+                        if (showRemoved) state.counts[AppFilter.REMOVED] ?: 0 else state.totalCount,
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
+                if (!showRemoved) SortChip(state.settings.sort, viewModel::setSort)
             }
-            val showRemoved = state.settings.filter == AppFilter.REMOVED
-            Text(
-                text = stringResource(
-                    R.string.count_shown,
-                    if (showRemoved) state.removed.size else state.apps.size,
-                    if (showRemoved) state.counts[AppFilter.REMOVED] ?: 0 else state.totalCount,
-                ),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
-            )
-            if (!showRemoved) SortChip(state.settings.sort, viewModel::setSort)
-
             // Thin progress bar while refreshing (keeps the old list visible)
             Box(Modifier.fillMaxWidth().height(2.dp)) {
                 if (state.isLoading && state.hasData) {
@@ -215,15 +212,23 @@ fun AppListScreen(
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            } else { AppList(state) { app -> openAppInfo(context, app)
-                }
+            } else {
+                AppList(
+                    state = state,
+                    onClick = { app -> openAppInfo(context, app) },
+                    onLongClick = { app -> onOpenDetails(app.key) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun AppList(state: AppListUiState, onClick: (AppEntry) -> Unit) {
+private fun AppList(
+    state: AppListUiState,
+    onClick: (AppEntry) -> Unit,
+    onLongClick: (AppEntry) -> Unit,
+) {
     val context = LocalContext.current
     val showRemoved = state.settings.filter == AppFilter.REMOVED
     val isEmpty = if (showRemoved) state.removed.isEmpty() else state.apps.isEmpty()
@@ -251,7 +256,17 @@ private fun AppList(state: AppListUiState, onClick: (AppEntry) -> Unit) {
                     now = state.now,
                     showCategory = state.settings.showCategory,
                     showSource = state.settings.showSource,
+                    showSize = state.settings.showSize,
+                    showDescription = state.settings.showDescription,
+                    weekMs = if (app.profile == AppProfile.THIS && state.hasUsageAccess) {
+                        state.weekUsage[app.packageName] ?: 0L
+                    } else {
+                        null
+                    },
+                    size = state.sizes?.get(app.key),
+                    sizesReady = state.sizes != null,
                     onClick = { onClick(app) },
+                    onLongClick = { onLongClick(app) },
                 )
             }
         }
@@ -328,6 +343,31 @@ private fun filterLabelRes(filter: AppFilter): Int = when (filter) {
     AppFilter.REMOVED -> R.string.filter_removed
 }
 
+/** Single-choice category chips; counts follow the main filter. */
+@Composable
+private fun CategoryRow(selected: Int?, counts: Map<Int, Int>, onSelect: (Int?) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilterChip(
+            selected = selected == null,
+            onClick = { onSelect(null) },
+            label = { Text(stringResource(R.string.category_all)) },
+        )
+        counts.entries.sortedByDescending { it.value }.forEach { (category, count) ->
+            FilterChip(
+                selected = selected == category,
+                onClick = { onSelect(category) },
+                label = { Text(stringResource(R.string.chip_with_count, categoryTitle(category), count)) },
+            )
+        }
+    }
+}
+
 @Composable
 private fun SortChip(current: SortOrder, onSelect: (SortOrder) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
@@ -367,6 +407,59 @@ private fun sortLabelRes(order: SortOrder): Int = when (order) {
     SortOrder.UPDATED -> R.string.sort_updated
     SortOrder.LAST_USED -> R.string.sort_last_used
     SortOrder.RECENTLY_USED -> R.string.sort_recently_used
+    SortOrder.MOST_USED -> R.string.sort_most_used
+    SortOrder.SIZE -> R.string.sort_size
+}
+
+/** ⋮ menu: checkable view options + settings. */
+@Composable
+private fun ViewOptionsMenu(
+    settings: ListSettings,
+    onShowCategory: (Boolean) -> Unit,
+    onShowSource: (Boolean) -> Unit,
+    onShowSize: (Boolean) -> Unit,
+    onShowDescription: (Boolean) -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                painterResource(R.drawable.ic_more_vert),
+                contentDescription = stringResource(R.string.view_options),
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_category)) },
+                onClick = { onShowCategory(!settings.showCategory) },
+                leadingIcon = { Checkbox(checked = settings.showCategory, onCheckedChange = null) },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_source)) },
+                onClick = { onShowSource(!settings.showSource) },
+                leadingIcon = { Checkbox(checked = settings.showSource, onCheckedChange = null) },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_size)) },
+                onClick = { onShowSize(!settings.showSize) },
+                leadingIcon = { Checkbox(checked = settings.showSize, onCheckedChange = null) },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_description)) },
+                onClick = { onShowDescription(!settings.showDescription) },
+                leadingIcon = { Checkbox(checked = settings.showDescription, onCheckedChange = null) },
+            )
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.settings_title)) },
+                onClick = {
+                    expanded = false
+                    onOpenSettings()
+                },
+            )
+        }
+    }
 }
 
 @Composable
@@ -407,68 +500,4 @@ private fun LanguageDialog(onChoose: (String) -> Unit) {
             }
         },
     )
-}
-
-/** ⋮ menu with checkable view options. */
-@Composable
-private fun ViewOptionsMenu(
-    settings: ListSettings,
-    onShowCategory: (Boolean) -> Unit,
-    onShowSource: (Boolean) -> Unit,
-    onOpenSettings: () -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { expanded = true }) {
-            Icon(
-                painterResource(R.drawable.ic_more_vert),
-                contentDescription = stringResource(R.string.view_options),
-            )
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.show_category)) },
-                onClick = { onShowCategory(!settings.showCategory) },
-                leadingIcon = { Checkbox(checked = settings.showCategory, onCheckedChange = null) },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.show_source)) },
-                onClick = { onShowSource(!settings.showSource) },
-                leadingIcon = { Checkbox(checked = settings.showSource, onCheckedChange = null) },
-            )
-            HorizontalDivider()
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.settings_title)) },
-                onClick = {
-                    expanded = false
-                    onOpenSettings()
-                },
-            )
-        }
-    }
-}
-
-/** Single-choice category chips; counts follow the main filter. */
-@Composable
-private fun CategoryRow(selected: Int?, counts: Map<Int, Int>, onSelect: (Int?) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        FilterChip(
-            selected = selected == null,
-            onClick = { onSelect(null) },
-            label = { Text(stringResource(R.string.category_all)) },
-        )
-        counts.entries.sortedByDescending { it.value }.forEach { (category, count) ->
-            FilterChip(
-                selected = selected == category,
-                onClick = { onSelect(category) },
-                label = { Text(stringResource(R.string.chip_with_count, categoryTitle(category), count)) },
-            )
-        }
-    }
 }

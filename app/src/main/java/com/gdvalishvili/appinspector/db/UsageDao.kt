@@ -59,4 +59,13 @@ abstract class UsageDao {
     /** Name of an app that is no longer installed, from the journal. */
     @Query("SELECT label FROM app_event WHERE package_name = :packageName ORDER BY time DESC LIMIT 1")
     abstract suspend fun lastKnownLabel(packageName: String): String?
+
+    @Query(
+        "SELECT day, SUM(foreground_ms) AS ms FROM daily_usage " +
+                "WHERE package_name = :packageName AND day BETWEEN :from AND :to GROUP BY day"
+    )
+    abstract suspend fun dailyTotalsForPackage(packageName: String, from: String, to: String): List<DayTotal>
+
+    @Query("SELECT * FROM app_event WHERE package_name = :packageName AND profile = :profile ORDER BY time DESC")
+    abstract suspend fun eventsForPackage(packageName: String, profile: String): List<AppEventEntity>
 }

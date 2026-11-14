@@ -10,6 +10,7 @@ import com.gdvalishvili.appinspector.model.UsageStatus
 import com.gdvalishvili.appinspector.ui.filterAndSort
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import com.gdvalishvili.appinspector.model.AppSize
 
 class FilterAndSortTest {
 
@@ -84,5 +85,23 @@ class FilterAndSortTest {
         val on = ListSettings(filter = AppFilter.ALL, showCategory = true, category = 0)
         assertEquals(2, filterAndSort(list, off, "").size)
         assertEquals(listOf("Game"), names(filterAndSort(list, on, "")))
+    }
+
+    @Test
+    fun mostUsedAndSizeSorts() {
+        val list = listOf(app("a", "A"), app("b", "B"), app("c", "C"))
+        val all = ListSettings(filter = AppFilter.ALL)
+
+        val week = mapOf("a" to 100L, "b" to 500L) // c: no usage
+        assertEquals(
+            listOf("B", "A", "C"),
+            names(filterAndSort(list, all.copy(sort = SortOrder.MOST_USED), "", weekUsage = week)),
+        )
+
+        val sizes = mapOf("THIS:c" to AppSize(900, 0, 0), "THIS:a" to AppSize(100, 0, 0)) // b: unknown
+        assertEquals(
+            listOf("C", "A", "B"),
+            names(filterAndSort(list, all.copy(sort = SortOrder.SIZE), "", sizes = sizes)),
+        )
     }
 }

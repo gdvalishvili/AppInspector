@@ -55,3 +55,12 @@ fun openAppInfoForPackage(context: Context, packageName: String) {
         Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
     }
 }
+
+/** Opens the system uninstall dialog (the user confirms). Needs REQUEST_DELETE_PACKAGES. */
+fun requestUninstall(context: Context, packageName: String) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_DELETE, Uri.fromParts("package", packageName, null)))
+    } catch (e: Exception) {
+        Toast.makeText(context, R.string.error_open_app_info, Toast.LENGTH_SHORT).show()
+    }
+}

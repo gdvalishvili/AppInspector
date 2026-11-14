@@ -73,6 +73,8 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +82,7 @@ fun ReportScreen(
     onBack: () -> Unit,
     requestedPeriod: Period? = null,
     onRequestHandled: () -> Unit = {},
+    onOpenDetails: (String) -> Unit = {},
     viewModel: ReportViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -171,10 +174,15 @@ fun ReportScreen(
                     }
                 }
                 items(apps, key = { it.packageName }) { app ->
-                    ReportAppRow(app, report.totalMs) {
-                        if (app.installed) openAppInfoForPackage(context, app.packageName)
-                        else openStorePage(context, app.packageName)
-                    }
+                    ReportAppRow(
+                        app = app,
+                        totalMs = report.totalMs,
+                        onClick = {
+                            if (app.installed) openAppInfoForPackage(context, app.packageName)
+                            else openStorePage(context, app.packageName)
+                        },
+                        onLongClick = { if (app.installed) onOpenDetails("THIS:${app.packageName}") },
+                    )
                 }
                 if (report.changes.isNotEmpty()) {
                     item { ChangesSection(report.changes) }
@@ -308,13 +316,14 @@ private fun SortRow(current: ReportSort, onSelect: (ReportSort) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ReportAppRow(app: AppUsage, totalMs: Long, onClick: () -> Unit) {
+private fun ReportAppRow(app: AppUsage, totalMs: Long, onClick: () -> Unit, onLongClick: () -> Unit) {
     val fraction = if (totalMs > 0L) app.ms.toFloat() / totalMs else 0f
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

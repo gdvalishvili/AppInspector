@@ -1,8 +1,11 @@
 package com.gdvalishvili.appinspector.ui.components
 
+import android.text.format.Formatter
 import androidx.annotation.StringRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -38,30 +43,45 @@ import com.gdvalishvili.appinspector.R
 import com.gdvalishvili.appinspector.model.AppEntry
 import com.gdvalishvili.appinspector.model.AppKind
 import com.gdvalishvili.appinspector.model.AppProfile
+import com.gdvalishvili.appinspector.model.AppSize
+import com.gdvalishvili.appinspector.model.RemovedApp
 import com.gdvalishvili.appinspector.model.UsageStatus
+import com.gdvalishvili.appinspector.util.AppDescriptions
 import com.gdvalishvili.appinspector.util.AppIcons
+import com.gdvalishvili.appinspector.util.categoryTitle
 import com.gdvalishvili.appinspector.util.formatDate
+import com.gdvalishvili.appinspector.util.formatDateTime
+import com.gdvalishvili.appinspector.util.formatDuration
 import com.gdvalishvili.appinspector.util.relativeTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
-import com.gdvalishvili.appinspector.model.RemovedApp
-import com.gdvalishvili.appinspector.util.formatDateTime
-import com.gdvalishvili.appinspector.util.categoryTitle
 
 private val ICON_SIZE = 44.dp
 private val STALE_MS = TimeUnit.DAYS.toMillis(90)
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** One installed app. Tap = system App info, long-press = our details screen. */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AppRow(
     app: AppEntry,
     now: Long,
     showCategory: Boolean,
     showSource: Boolean,
+    showSize: Boolean,
+    showDescription: Boolean,
+    weekMs: Long?,          // null = not available (work app or no Usage access)
+    size: AppSize?,
+    sizesReady: Boolean,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(CardDefaults.shape)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+    ) {
         Row(Modifier.padding(12.dp)) {
             AppIcon(app)
             Spacer(Modifier.width(12.dp))
@@ -87,8 +107,11 @@ fun AppRow(
                 DateLine(R.string.label_installed, installedText(app))
                 DateLine(R.string.label_updated, updatedText(app))
                 DateLine(R.string.label_last_used, lastUsedText(app, now))
+                if (weekMs != null) DateLine(R.string.label_week, formatDuration(weekMs))
                 if (showCategory) DateLine(R.string.label_category, categoryTitle(app.category))
                 if (showSource) DateLine(R.string.label_source, sourceText(app))
+                if (showSize) DateLine(R.string.label_size, sizeText(size, sizesReady))
+                if (showDescription) DescriptionLine(app)
             }
         }
     }
@@ -189,8 +212,10 @@ private fun DateLine(@StringRes label: Int, value: String) {
     )
 }
 
+// ---------- Texts shared with the details screen ----------
+
 @Composable
-private fun installedText(app: AppEntry): String {
+internal fun installedText(app: AppEntry): String {
     val installedAt = app.installedAt
     return when {
         app.isFactoryInstall -> stringResource(R.string.value_factory)
@@ -200,7 +225,7 @@ private fun installedText(app: AppEntry): String {
 }
 
 @Composable
-private fun updatedText(app: AppEntry): String {
+internal fun updatedText(app: AppEntry): String {
     val updatedAt = app.updatedAt
     return when {
         updatedAt == null ->
@@ -212,7 +237,7 @@ private fun updatedText(app: AppEntry): String {
 }
 
 @Composable
-private fun lastUsedText(app: AppEntry, now: Long): String {
+internal fun lastUsedText(app: AppEntry, now: Long): String {
     val lastUsedAt = app.lastUsedAt
     return when (app.usageStatus) {
         UsageStatus.USED ->
@@ -227,7 +252,7 @@ private fun lastUsedText(app: AppEntry, now: Long): String {
 }
 
 @Composable
-private fun sourceText(app: AppEntry): String {
+internal fun sourceText(app: AppEntry): String {
     val installer = app.installerPackage
     return when {
         !app.installSourceKnown -> stringResource(R.string.value_dash)
@@ -238,6 +263,46 @@ private fun sourceText(app: AppEntry): String {
         else -> app.installerLabel ?: installer
     }
 }
+
+@Composable
+internal fun sizeText(size: AppSize?, ready: Boolean): String {
+    val context = LocalContext.current
+    return when {
+        size != null -> stringResource(
+            R.string.size_detail,
+            Formatter.formatShortFileSize(context, size.total),
+            Formatter.formatShortFileSize(context, size.appBytes),
+            Formatter.formatShortFileSize(context, size.dataBytes),
+        )
+        !ready -> stringResource(R.string.value_loading)
+        else -> stringResource(R.string.value_dash)
+    }
+}
+
+/** Manifest description, loaded lazily only for rows on screen. */
+@Composable
+internal fun DescriptionLine(app: AppEntry) {
+    val context = LocalContext.current
+    val text by produceState<String?>(AppDescriptions.cached(app.key), app.key) {
+        if (value == null) {
+            value = withContext(Dispatchers.IO) { AppDescriptions.load(context.applicationContext, app) }
+        }
+    }
+    val shown = when (val t = text) {
+        null -> stringResource(R.string.value_loading)
+        "" -> stringResource(R.string.value_dash)
+        else -> t
+    }
+    Text(
+        text = stringResource(R.string.label_description) + ": " + shown,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+// ---------- Removed apps ----------
 
 /** Row for a removed app. Tap opens its Play Store page. */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.map
 import java.io.IOException
 import java.time.LocalDate
 
-enum class SortOrder { NAME, INSTALLED, UPDATED, LAST_USED, RECENTLY_USED }
+enum class SortOrder { NAME, INSTALLED, UPDATED, LAST_USED, RECENTLY_USED, MOST_USED, SIZE }
 
 /** Exactly one filter is active at a time. */
 enum class AppFilter { ALL, USER, SYSTEM, WORK, REMOVED }
@@ -28,6 +28,8 @@ data class ListSettings(
     val sort: SortOrder = SortOrder.NAME,
     val showCategory: Boolean = false,
     val showSource: Boolean = false,
+    val showSize: Boolean = false,
+    val showDescription: Boolean = false,
     val category: Int? = null,          // null = all categories
 )
 
@@ -58,6 +60,8 @@ class SettingsStore(private val context: Context) {
                 ?: SortOrder.NAME,
             showCategory = p[SHOW_CATEGORY] ?: false,
             showSource = p[SHOW_SOURCE] ?: false,
+            showSize = p[SHOW_SIZE] ?: false,
+            showDescription = p[SHOW_DESCRIPTION] ?: false,
             category = p[CATEGORY],
         )
     }
@@ -79,6 +83,14 @@ class SettingsStore(private val context: Context) {
 
     suspend fun setShowSource(value: Boolean) {
         context.settingsDataStore.edit { it[SHOW_SOURCE] = value }
+    }
+
+    suspend fun setShowSize(value: Boolean) {
+        context.settingsDataStore.edit { it[SHOW_SIZE] = value }
+    }
+
+    suspend fun setShowDescription(value: Boolean) {
+        context.settingsDataStore.edit { it[SHOW_DESCRIPTION] = value }
     }
 
     suspend fun setCategory(value: Int?) {
@@ -190,5 +202,7 @@ class SettingsStore(private val context: Context) {
         val LAST_SENT_MONTH = stringPreferencesKey("last_sent_month")
         val LAST_USAGE_DAY = stringPreferencesKey("last_usage_day")
         val USAGE_ALGORITHM_VERSION = intPreferencesKey("usage_algorithm_version")
+        val SHOW_SIZE = booleanPreferencesKey("show_size")
+        val SHOW_DESCRIPTION = booleanPreferencesKey("show_description")
     }
 }
