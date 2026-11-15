@@ -29,10 +29,10 @@ import com.gdvalishvili.appinspector.ui.settings.SettingsScreen
 import com.gdvalishvili.appinspector.ui.theme.AppInspectorTheme
 import java.time.LocalDate
 import com.gdvalishvili.appinspector.ui.updates.UpdatesScreen
+import com.gdvalishvili.appinspector.ui.cleanup.CleanupScreen
 
 /** Simple state-based navigation (no navigation library needed). */
-enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES }
-
+enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP }
 class MainActivity : ComponentActivity() {
 
     /** Period requested by a notification tap (or a chart bar); consumed by the report screen. */
@@ -71,6 +71,7 @@ class MainActivity : ComponentActivity() {
                         onOpenDetails = { key -> openDetails(key, Screen.LIST) },
                         viewModel = listViewModel,
                         onOpenUpdates = { screen = Screen.UPDATES },
+                        onOpenCleanup = { screen = Screen.CLEANUP },
                     )
                     Screen.REPORT -> {
                         BackHandler { screen = Screen.LIST }
@@ -92,6 +93,15 @@ class MainActivity : ComponentActivity() {
                             weekUsage = listStateForUpdates.weekUsage,
                             onBack = { screen = Screen.LIST },
                             onOpenDetails = { key -> openDetails(key, Screen.UPDATES) },
+                            onRefreshList = listViewModel::refresh,
+                        )
+                    }
+                    Screen.CLEANUP -> {
+                        BackHandler { screen = Screen.LIST }
+                        CleanupScreen(
+                            apps = allApps,
+                            onBack = { screen = Screen.LIST },
+                            onOpenDetails = { key -> openDetails(key, Screen.CLEANUP) },
                             onRefreshList = listViewModel::refresh,
                         )
                     }
