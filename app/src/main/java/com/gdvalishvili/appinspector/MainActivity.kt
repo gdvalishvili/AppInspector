@@ -17,25 +17,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gdvalishvili.appinspector.model.Period
 import com.gdvalishvili.appinspector.model.PeriodType
 import com.gdvalishvili.appinspector.notify.ReportNotifier
 import com.gdvalishvili.appinspector.ui.AppListScreen
 import com.gdvalishvili.appinspector.ui.AppListViewModel
+import com.gdvalishvili.appinspector.ui.cleanup.CleanupScreen
 import com.gdvalishvili.appinspector.ui.details.AppDetailsScreen
 import com.gdvalishvili.appinspector.ui.report.ReportScreen
 import com.gdvalishvili.appinspector.ui.settings.SettingsScreen
 import com.gdvalishvili.appinspector.ui.theme.AppInspectorTheme
-import java.time.LocalDate
 import com.gdvalishvili.appinspector.ui.updates.UpdatesScreen
-import com.gdvalishvili.appinspector.ui.cleanup.CleanupScreen
+import com.gdvalishvili.appinspector.widget.UsageWidgetUpdater
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 /** Simple state-based navigation (no navigation library needed). */
 enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP }
+
 class MainActivity : ComponentActivity() {
 
-    /** Period requested by a notification tap (or a chart bar); consumed by the report screen. */
+    /** Period requested by a notification/widget tap (or a chart bar); consumed by the report screen. */
     private val requestedPeriod = mutableStateOf<Period?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,15 +136,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** App already open (singleTop) and the user taps a notification. */
+    /** Opening the app refreshes the home screen widget (if one is placed). */
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch { UsageWidgetUpdater.refreshAll(applicationContext) }
+    }
+
+    /** App already open (singleTop) and the user taps a notification or the widget. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         readPeriod(intent)?.let { requestedPeriod.value = it }
     }
 
     private fun readPeriod(intent: Intent?): Period? {
+        // Widget: "today" is decided at tap time, not when the widget was drawn
+        if (intent?.getBooleanExtra(EXTRA_OPEN_TODAY, false) == true) {
+            return Period.of(PeriodType.DAY, LocalDate.now())
+        }
         val type = intent?.getStringExtra(ReportNotifier.EXTRA_PERIOD_TYPE) ?: return null
         val start = intent.getStringExtra(ReportNotifier.EXTRA_PERIOD_START) ?: return null
         return runCatching { Period(PeriodType.valueOf(type), LocalDate.parse(start)) }.getOrNull()
+    }
+
+    companion object {
+        const val EXTRA_OPEN_TODAY = "open_today"
     }
 }

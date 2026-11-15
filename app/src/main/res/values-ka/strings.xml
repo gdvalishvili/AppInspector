@@ -204,4 +204,11 @@
     </plurals>
     <string name="action_open">გახსნა</string>
     <string name="error_open_app">აპის გახსნა ვერ მოხერხდა</string>
+    <string name="widget_name">App Inspector: დღეს</string>
+    <string name="widget_description">დღევანდელი ეკრანის დრო და ტოპ 3 აპი</string>
+    <string name="widget_today">დღეს</string>
+    <string name="widget_updated">განახლდა %1$s</string>
+    <string name="widget_loading">იტვირთება…</string>
+    <string name="widget_no_access">Usage access გამორთულია</string>
+    <string name="widget_no_apps">დღეს ჯერ არაფერი</string>
 </resources>

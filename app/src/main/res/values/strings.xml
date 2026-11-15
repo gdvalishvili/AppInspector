@@ -215,4 +215,11 @@
     </plurals>
     <string name="action_open">Open</string>
     <string name="error_open_app">Can\'t open this app</string>
+    <string name="widget_name">App Inspector: today</string>
+    <string name="widget_description">Today\'s screen time and top 3 apps</string>
+    <string name="widget_today">Today</string>
+    <string name="widget_updated">Updated %1$s</string>
+    <string name="widget_loading">Loading…</string>
+    <string name="widget_no_access">Usage access is off</string>
+    <string name="widget_no_apps">No usage yet today</string>
 </resources>

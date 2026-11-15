@@ -23,8 +23,8 @@ android {
         applicationId = "com.gdvalishvili.appinspector"
         minSdk = 26
         targetSdk = 37
-        versionCode = 12
-        versionName = "3.0.0-alpha3.1"
+        versionCode = 15
+        versionName = "3.0.0-alpha5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -96,4 +96,5 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.glance.appwidget)
 }

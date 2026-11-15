@@ -14,6 +14,7 @@ import com.gdvalishvili.appinspector.notify.ReportNotifier
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
+import com.gdvalishvili.appinspector.widget.UsageWidgetUpdater
 
 /**
  * Runs once a day at the chosen time (approximate: WorkManager saves battery). Survives reboots.
@@ -28,6 +29,7 @@ class DailyWorker(appContext: Context, params: WorkerParameters) :
         AppHistoryRepository(context).sync(snapshot.apps, snapshot.workProfile)
         UsageCollector(context).collectMissingDays()
         ReportNotifier.sendDueReports(context)
+        UsageWidgetUpdater.refreshAll(applicationContext)
         Result.success()
     } catch (e: Exception) {
         Log.e(TAG, "Daily work failed", e)
