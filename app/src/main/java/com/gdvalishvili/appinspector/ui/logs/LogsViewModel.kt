@@ -51,7 +51,8 @@ class LogsViewModel(application: Application) : AndroidViewModel(application) {
 
     val autoDelete: StateFlow<Boolean> = prefs.autoDelete
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), true)
-
+    val keepCount: StateFlow<Int> = prefs.keepCount
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LogsPrefs.DEFAULT_KEEP)
     private var scopeKey: String? = null
     private var packageName: String? = null
     private var uid: Int? = null
@@ -111,9 +112,15 @@ class LogsViewModel(application: Application) : AndroidViewModel(application) {
     /** Saves the full live buffer (not only the filtered lines), so filters still work later. */
     suspend fun saveSnapshot(): Boolean {
         val s = _state.value
-        if (s.viewing != null || s.lines.isEmpty()) return false
-        val keep = if (autoDelete.value) MAX_SNAPSHOTS else null
-        withContext(Dispatchers.IO) { snapshotStore.save(s.lines, packageName, keep) }
+        if (s.viewing != null) return false
+        return saveLines(s.lines)
+    }
+
+    /** Saves exactly these lines (e.g. a selection). Works on live and saved logs. */
+    suspend fun saveLines(lines: List<LogLine>): Boolean {
+        if (lines.isEmpty()) return false
+        val keep = if (autoDelete.value) keepCount.value else null
+        withContext(Dispatchers.IO) { snapshotStore.save(lines, packageName, keep) }
         loadSnapshots()
         return true
     }
@@ -140,6 +147,10 @@ class LogsViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { prefs.setAutoDelete(value) }
     }
 
+    fun setKeepCount(value: Int) {
+        viewModelScope.launch { prefs.setKeepCount(value) }
+    }
+
     private fun readLogsGranted() =
         app.checkSelfPermission(DropBoxReader.READ_LOGS) == PackageManager.PERMISSION_GRANTED
 
@@ -159,7 +170,6 @@ class LogsViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     companion object {
-        const val MAX_SNAPSHOTS = 20
         private const val SYSTEM_KEY = "SYSTEM"
     }
 }

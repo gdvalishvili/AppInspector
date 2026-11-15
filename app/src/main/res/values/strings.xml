@@ -250,7 +250,10 @@
     <string name="logs_snapshot_banner">Saved log: %1$s</string>
     <string name="logs_back_to_live">Back to live</string>
     <string name="logs_saved_toast">Saved</string>
-    <string name="logs_auto_delete">Auto delete: keep the last %1$d</string>
+    <string name="logs_auto_delete">Auto delete</string>
+    <string name="logs_keep_count">Files to keep</string>
+    <string name="logs_keep_hint">The last %1$d files are kept; older ones are deleted when you save a new one.</string>
+    <string name="logs_keep_off">All files are kept until you delete them.</string>
     <string name="logs_saved_summary">%1$d saved · %2$s</string>
     <string name="logs_saved_empty">Nothing saved yet. Use “Save” on the Log tab.</string>
     <string name="logs_delete">Delete</string>
@@ -270,4 +273,10 @@
     <string name="logs_range_yesterday">Yesterday</string>
     <string name="logs_range_from">From</string>
     <string name="logs_range_to">To</string>
+    <string name="logs_go_top">Go to top</string>
+    <string name="logs_go_bottom">Go to bottom</string>
+    <string name="logs_selected_count">%1$d selected</string>
+    <string name="logs_select_visible">All visible</string>
+    <string name="logs_select_hint">Long-press another line to select everything in between</string>
+    <string name="logs_copy_too_large">Too much text to copy. Use Share or Save instead.</string>
 </resources>

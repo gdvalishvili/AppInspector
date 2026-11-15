@@ -239,7 +239,10 @@
     <string name="logs_snapshot_banner">შენახული ლოგი: %1$s</string>
     <string name="logs_back_to_live">ცოცხალ ლოგზე დაბრუნება</string>
     <string name="logs_saved_toast">შენახულია</string>
-    <string name="logs_auto_delete">ავტომატური წაშლა: რჩება ბოლო %1$d</string>
+    <string name="logs_auto_delete">ავტომატური წაშლა</string>
+    <string name="logs_keep_count">შესანახი ფაილების რაოდენობა</string>
+    <string name="logs_keep_hint">რჩება ბოლო %1$d ფაილი; ძველი იშლება ახლის შენახვისას.</string>
+    <string name="logs_keep_off">ყველა ფაილი რჩება, სანამ ხელით არ წაშლი.</string>
     <string name="logs_saved_summary">%1$d შენახვა · %2$s</string>
     <string name="logs_saved_empty">ჯერ არაფერია შენახული. „ლოგი“ ჩანართზე დააჭირე „შენახვას“.</string>
     <string name="logs_delete">წაშლა</string>
@@ -259,4 +262,10 @@
     <string name="logs_range_yesterday">გუშინ</string>
     <string name="logs_range_from">დან</string>
     <string name="logs_range_to">მდე</string>
+    <string name="logs_go_top">თავში გადასვლა</string>
+    <string name="logs_go_bottom">ბოლოში გადასვლა</string>
+    <string name="logs_selected_count">%1$d მონიშნული</string>
+    <string name="logs_select_visible">ყველა ხილული</string>
+    <string name="logs_select_hint">სხვა ხაზზე გრძელი დაჭერა მონიშნავს ყველაფერს შუალედში</string>
+    <string name="logs_copy_too_large">კოპირებისთვის ტექსტი ძალიან დიდია. გამოიყენე „გაზიარება“ ან „შენახვა“.</string>
 </resources>
