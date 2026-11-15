@@ -12,6 +12,7 @@ import com.gdvalishvili.appinspector.model.AppProfile
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 
+
 /** Opens the system "App info" screen; work apps go through LauncherApps (verified in spike). */
 fun openAppInfo(context: Context, app: AppEntry) {
     try {
@@ -103,4 +104,28 @@ fun openPlayUpdates(context: Context) {
         }
     }
     openPlayStoreApp(context)
+}
+
+/** Launches the app: this profile via its launch intent, work profile via LauncherApps. */
+fun openApp(context: Context, app: AppEntry) {
+    try {
+        if (app.profile == AppProfile.WORK) {
+            val component = app.component
+            val user = app.user
+            if (component != null && user != null) {
+                context.getSystemService(LauncherApps::class.java)
+                    .startMainActivity(component, user, null, null)
+                return
+            }
+        } else {
+            val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+            if (intent != null) {
+                context.startActivity(intent)
+                return
+            }
+        }
+    } catch (e: Exception) {
+        // fall through to the message
+    }
+    Toast.makeText(context, R.string.error_open_app, Toast.LENGTH_SHORT).show()
 }

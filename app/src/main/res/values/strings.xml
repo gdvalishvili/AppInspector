@@ -213,4 +213,6 @@
         <item quantity="one">%1$d day ago</item>
         <item quantity="other">%1$d days ago</item>
     </plurals>
+    <string name="action_open">Open</string>
+    <string name="error_open_app">Can\'t open this app</string>
 </resources>

@@ -202,4 +202,6 @@
         <item quantity="one">%1$d დღის წინ</item>
         <item quantity="other">%1$d დღის წინ</item>
     </plurals>
+    <string name="action_open">გახსნა</string>
+    <string name="error_open_app">აპის გახსნა ვერ მოხერხდა</string>
 </resources>

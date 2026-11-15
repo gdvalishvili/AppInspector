@@ -71,6 +71,7 @@ import com.gdvalishvili.appinspector.util.requestUninstall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import com.gdvalishvili.appinspector.util.openApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,6 +185,11 @@ private fun Actions(app: AppEntry) {
         modifier = Modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        if (app.hasLauncher && !app.isArchived) {
+            OutlinedButton(onClick = { openApp(context, app) }) {
+                Text(stringResource(R.string.action_open))
+            }
+        }
         FilledTonalButton(onClick = { openAppInfo(context, app) }) {
             Text(stringResource(R.string.action_app_info))
         }
