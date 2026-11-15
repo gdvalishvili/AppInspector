@@ -80,6 +80,7 @@ fun AppDetailsScreen(
     onBack: () -> Unit,
     onOpenDay: (LocalDate) -> Unit,
     onRefreshList: () -> Unit,
+    onOpenLogs: () -> Unit = {},
 ) {
     // One ViewModel per app
     val viewModel: AppDetailsViewModel = viewModel(key = "details:${app.key}")
@@ -116,7 +117,7 @@ fun AppDetailsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { Header(app, extras?.versionCode) }
-            item { Actions(app) }
+            item { Actions(app, onOpenLogs) }
             val current = extras
             if (current == null) {
                 item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
@@ -179,7 +180,7 @@ private fun BigIcon(app: AppEntry) {
 }
 
 @Composable
-private fun Actions(app: AppEntry) {
+private fun Actions(app: AppEntry, onOpenLogs: () -> Unit) {
     val context = LocalContext.current
     Row(
         modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -195,6 +196,9 @@ private fun Actions(app: AppEntry) {
         }
         OutlinedButton(onClick = { openStorePage(context, app.packageName) }) {
             Text(stringResource(R.string.action_store))
+        }
+        OutlinedButton(onClick = onOpenLogs) {
+            Text(stringResource(R.string.logs_title))
         }
         // Only user apps in this profile can be uninstalled from here (system/work: via App info)
         if (app.profile == AppProfile.THIS && app.kind == AppKind.USER) {

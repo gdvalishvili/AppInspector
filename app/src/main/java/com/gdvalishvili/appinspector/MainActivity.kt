@@ -26,6 +26,7 @@ import com.gdvalishvili.appinspector.ui.AppListScreen
 import com.gdvalishvili.appinspector.ui.AppListViewModel
 import com.gdvalishvili.appinspector.ui.cleanup.CleanupScreen
 import com.gdvalishvili.appinspector.ui.details.AppDetailsScreen
+import com.gdvalishvili.appinspector.ui.logs.LogsScreen
 import com.gdvalishvili.appinspector.ui.report.ReportScreen
 import com.gdvalishvili.appinspector.ui.settings.SettingsScreen
 import com.gdvalishvili.appinspector.ui.theme.AppInspectorTheme
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 /** Simple state-based navigation (no navigation library needed). */
-enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP }
+enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP, LOGS }
 
 class MainActivity : ComponentActivity() {
 
@@ -56,11 +57,19 @@ class MainActivity : ComponentActivity() {
                 var screen by rememberSaveable { mutableStateOf(Screen.LIST) }
                 var detailsKey by rememberSaveable { mutableStateOf<String?>(null) }
                 var detailsReturn by rememberSaveable { mutableStateOf(Screen.LIST) }
+                var logsAppKey by rememberSaveable { mutableStateOf<String?>(null) }   // null = system logs
+                var logsReturn by rememberSaveable { mutableStateOf(Screen.LIST) }
 
                 fun openDetails(key: String, from: Screen) {
                     detailsKey = key
                     detailsReturn = from
                     screen = Screen.DETAILS
+                }
+
+                fun openLogs(key: String?, from: Screen) {
+                    logsAppKey = key
+                    logsReturn = from
+                    screen = Screen.LOGS
                 }
 
                 val request = requestedPeriod.value
@@ -76,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         viewModel = listViewModel,
                         onOpenUpdates = { screen = Screen.UPDATES },
                         onOpenCleanup = { screen = Screen.CLEANUP },
+                        onOpenLogs = { openLogs(null, Screen.LIST) },
                     )
                     Screen.REPORT -> {
                         BackHandler { screen = Screen.LIST }
@@ -109,6 +119,17 @@ class MainActivity : ComponentActivity() {
                             onRefreshList = listViewModel::refresh,
                         )
                     }
+                    Screen.LOGS -> {
+                        BackHandler { screen = logsReturn }
+                        val key = logsAppKey
+                        val target = key?.let { k -> allApps?.firstOrNull { it.key == k } }
+                        if (key != null && target == null) {
+                            // App is gone (or list not loaded): go back
+                            LaunchedEffect(Unit) { screen = logsReturn }
+                        } else {
+                            LogsScreen(app = target, onBack = { screen = logsReturn })
+                        }
+                    }
                     Screen.DETAILS -> {
                         BackHandler { screen = detailsReturn }
                         val apps = allApps
@@ -119,6 +140,7 @@ class MainActivity : ComponentActivity() {
                                 onBack = { screen = detailsReturn },
                                 onOpenDay = { day -> requestedPeriod.value = Period.of(PeriodType.DAY, day) },
                                 onRefreshList = listViewModel::refresh,
+                                onOpenLogs = { openLogs(app.key, Screen.DETAILS) },
                             )
                             // App was uninstalled (or is gone): go back
                             apps != null -> LaunchedEffect(Unit) { screen = detailsReturn }

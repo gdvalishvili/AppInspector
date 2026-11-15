@@ -19,6 +19,15 @@
     <uses-permission
         android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
+    <!-- System-wide logs; granted once via adb (pm grant). Personal app, not for Play. -->
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Crash/ANR history (DropBox); granted once via adb -->
+    <uses-permission
+        android:name="android.permission.READ_DROPBOX_DATA"
+        tools:ignore="ProtectedPermissions" />
+
     <application
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -51,6 +60,7 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
         <!-- Home screen widget: today's time + top 3 -->
         <receiver
             android:name=".widget.UsageWidgetReceiver"
@@ -63,6 +73,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/usage_widget_info" />
         </receiver>
+
+        <!-- Share log files as .txt (content:// links, no storage permission needed) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>
