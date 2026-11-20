@@ -54,6 +54,7 @@ import com.gdvalishvili.appinspector.db.EventType
 import com.gdvalishvili.appinspector.model.AppEntry
 import com.gdvalishvili.appinspector.model.AppKind
 import com.gdvalishvili.appinspector.model.AppProfile
+import com.gdvalishvili.appinspector.ui.background.BackgroundDetailsSection
 import com.gdvalishvili.appinspector.ui.components.DescriptionLine
 import com.gdvalishvili.appinspector.ui.components.installedText
 import com.gdvalishvili.appinspector.ui.components.lastUsedText
@@ -65,13 +66,13 @@ import com.gdvalishvili.appinspector.util.AppIcons
 import com.gdvalishvili.appinspector.util.categoryTitle
 import com.gdvalishvili.appinspector.util.formatDateTime
 import com.gdvalishvili.appinspector.util.formatDuration
+import com.gdvalishvili.appinspector.util.openApp
 import com.gdvalishvili.appinspector.util.openAppInfo
 import com.gdvalishvili.appinspector.util.openStorePage
 import com.gdvalishvili.appinspector.util.requestUninstall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import com.gdvalishvili.appinspector.util.openApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,6 +125,8 @@ fun AppDetailsScreen(
             } else {
                 current.days?.let { days -> item { UsageSection(days, today, onOpenDay) } }
                 item { InfoSection(app, current) }
+                // Foreground services, background data, bucket, battery, capabilities
+                item { BackgroundDetailsSection(app) }
                 current.permissions?.let { permissions -> item { PermissionsSection(permissions) } }
                 if (current.events.isNotEmpty()) item { HistorySection(current.events) }
             }

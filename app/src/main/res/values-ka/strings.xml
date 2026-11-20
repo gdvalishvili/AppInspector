@@ -298,4 +298,19 @@
     <string name="bg_bucket_other">სხვა / სისტემური</string>
     <string name="bg_battery_exempt">ბატარეა შეუზღუდავი (ოპტიმიზაციას არ ექვემდებარება)</string>
     <string name="bg_battery_empty">არცერთი</string>
+    <string name="bg_details_title">ფონი (7 დღე)</string>
+    <string name="bg_details_no_fgs">foreground service არ ყოფილა</string>
+    <string name="bg_details_no_data">ფონური ინტერნეტი არ ყოფილა</string>
+    <string name="bg_details_bucket">კალათა: %1$s</string>
+    <string name="bg_details_bucket_unknown">კალათა: 7 დღეში არ შეცვლილა</string>
+    <string name="bg_details_battery_yes">ბატარეა: შეუზღუდავი</string>
+    <string name="bg_details_battery_no">ბატარეა: ოპტიმიზებული</string>
+    <string name="bg_details_caps">შეუძლია: %1$s</string>
+    <string name="bg_cap_boot">ჩართვა ტელეფონის ჩატვირთვისას</string>
+    <string name="bg_cap_alarm">ზუსტი მაღვიძარა</string>
+    <string name="bg_cap_wakelock">პროცესორის ფხიზლად დატოვება (wake lock)</string>
+    <string name="bg_cap_battery">ბატარეის ოპტიმიზაციის გამორთვის მოთხოვნა</string>
+    <string name="bg_cap_fgs">foreground service: %1$s</string>
+    <string name="bg_details_work">work profile-ის აპებისთვის არ არის ხელმისაწვდომი</string>
+    <string name="bg_cleanup_warning">⚠ ფონზე მუშაობს</string>
 </resources>

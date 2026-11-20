@@ -310,4 +310,19 @@
     <string name="bg_bucket_other">Other / system</string>
     <string name="bg_battery_exempt">Unrestricted battery (ignores battery optimization)</string>
     <string name="bg_battery_empty">None</string>
+    <string name="bg_details_title">Background (7 days)</string>
+    <string name="bg_details_no_fgs">No foreground service</string>
+    <string name="bg_details_no_data">No background internet</string>
+    <string name="bg_details_bucket">Bucket: %1$s</string>
+    <string name="bg_details_bucket_unknown">Bucket: not changed in 7 days</string>
+    <string name="bg_details_battery_yes">Battery: unrestricted</string>
+    <string name="bg_details_battery_no">Battery: optimized</string>
+    <string name="bg_details_caps">Can: %1$s</string>
+    <string name="bg_cap_boot">start on boot</string>
+    <string name="bg_cap_alarm">exact alarms</string>
+    <string name="bg_cap_wakelock">keep the CPU awake (wake lock)</string>
+    <string name="bg_cap_battery">ask to ignore battery optimization</string>
+    <string name="bg_cap_fgs">foreground service: %1$s</string>
+    <string name="bg_details_work">Not available for work profile apps</string>
+    <string name="bg_cleanup_warning">⚠ Runs in the background</string>
 </resources>

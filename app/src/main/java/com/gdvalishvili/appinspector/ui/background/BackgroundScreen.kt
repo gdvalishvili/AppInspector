@@ -310,7 +310,7 @@ private fun LazyListScope.limitsTab(
     }
 }
 
-private fun bucketLabel(b: StandbyBucket) = when (b) {
+    fun bucketLabel(b: StandbyBucket) = when (b) {
     StandbyBucket.ACTIVE -> R.string.bg_bucket_active
     StandbyBucket.WORKING_SET -> R.string.bg_bucket_working_set
     StandbyBucket.FREQUENT -> R.string.bg_bucket_frequent

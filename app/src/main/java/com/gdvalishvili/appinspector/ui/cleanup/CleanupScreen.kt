@@ -77,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.Collator
 import java.util.concurrent.TimeUnit
+import com.gdvalishvili.appinspector.ui.background.rememberBackgroundActivePackages
 
 enum class CleanupSort { SIZE, LAST_USED, NAME }
 
@@ -125,6 +126,7 @@ fun CleanupScreen(
         grouped?.values?.flatten()?.map { it.packageName }?.distinct()?.let(viewModel::loadSizes)
     }
     val visible = remember(grouped, group, sort, sizes) { sortCleanup(grouped?.get(group).orEmpty(), sort, sizes) }
+    val backgroundActive = rememberBackgroundActivePackages(apps)
     val noAccess = apps?.any { it.usageStatus == UsageStatus.NO_PERMISSION } == true
     val selectable = group != CleanupGroup.EXCLUDED && run == null
     val visiblePackages = visible.map { it.packageName }.toSet()
@@ -254,6 +256,7 @@ fun CleanupScreen(
                     CleanupRow(
                         app = app,
                         sizeBytes = sizes[app.packageName],
+                        backgroundActive = app.packageName in backgroundActive,
                         selectable = selectable,
                         selected = app.packageName in selected,
                         isExcludedGroup = group == CleanupGroup.EXCLUDED,
@@ -406,6 +409,7 @@ private fun ProgressBar(run: UninstallRun, onStop: () -> Unit) {
 private fun CleanupRow(
     app: AppEntry,
     sizeBytes: Long?,
+    backgroundActive: Boolean,
     selectable: Boolean,
     selected: Boolean,
     isExcludedGroup: Boolean,
@@ -448,6 +452,13 @@ private fun CleanupRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (backgroundActive) {
+                    Text(
+                        text = stringResource(R.string.bg_cleanup_warning),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
             Spacer(Modifier.width(8.dp))
             Text(
