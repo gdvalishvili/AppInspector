@@ -34,10 +34,10 @@ import com.gdvalishvili.appinspector.ui.updates.UpdatesScreen
 import com.gdvalishvili.appinspector.widget.UsageWidgetUpdater
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.gdvalishvili.appinspector.ui.background.BackgroundScreen
 
 /** Simple state-based navigation (no navigation library needed). */
-enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP, LOGS }
-
+enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP, LOGS, BACKGROUND }
 class MainActivity : ComponentActivity() {
 
     /** Period requested by a notification/widget tap (or a chart bar); consumed by the report screen. */
@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
                         onOpenUpdates = { screen = Screen.UPDATES },
                         onOpenCleanup = { screen = Screen.CLEANUP },
                         onOpenLogs = { openLogs(null, Screen.LIST) },
+                        onOpenBackground = { screen = Screen.BACKGROUND },
                     )
                     Screen.REPORT -> {
                         BackHandler { screen = Screen.LIST }
@@ -117,6 +118,14 @@ class MainActivity : ComponentActivity() {
                             onBack = { screen = Screen.LIST },
                             onOpenDetails = { key -> openDetails(key, Screen.CLEANUP) },
                             onRefreshList = listViewModel::refresh,
+                        )
+                    }
+                    Screen.BACKGROUND -> {
+                        BackHandler { screen = Screen.LIST }
+                        BackgroundScreen(
+                            apps = allApps,
+                            onBack = { screen = Screen.LIST },
+                            onOpenDetails = { key -> openDetails(key, Screen.BACKGROUND) },
                         )
                     }
                     Screen.LOGS -> {
