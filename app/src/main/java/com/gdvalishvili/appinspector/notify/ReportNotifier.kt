@@ -17,15 +17,17 @@ import com.gdvalishvili.appinspector.db.EventType
 import com.gdvalishvili.appinspector.model.Period
 import com.gdvalishvili.appinspector.model.PeriodType
 import com.gdvalishvili.appinspector.util.formatDurationText
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.ZoneId
 
-/** Builds and posts the (silent) report notification. */
+/** Builds and posts the report notification (silent or with sound, per settings). */
 object ReportNotifier {
 
     const val EXTRA_PERIOD_TYPE = "period_type"
     const val EXTRA_PERIOD_START = "period_start"
     private const val CHANNEL_ID = "reports"
+    private const val CHANNEL_SOUND_ID = "reports_sound"
     private const val NOTIFICATION_ID = 1001
     private const val TOP_APPS = 3
 
@@ -63,23 +65,33 @@ object ReportNotifier {
 
         val repository = ReportRepository(context)
         val reports = periods.map { it to repository.load(it, zone) }
-        post(context, reports)
+        post(context, reports, withSound = settings.notifySound.first())
 
         if (!force) periods.forEach { settings.setLastSent(it.type, it.start) }
     }
 
-    private fun ensureChannel(context: Context) {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            context.getString(R.string.channel_reports),
-            NotificationManager.IMPORTANCE_LOW, // silent
-        ).apply { description = context.getString(R.string.channel_reports_desc) }
-        context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+    /** Two channels: Android does not let an app change a channel's sound after it is created. */
+    private fun ensureChannels(context: Context) {
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ID,
+                context.getString(R.string.channel_reports),
+                NotificationManager.IMPORTANCE_LOW, // silent
+            ).apply { description = context.getString(R.string.channel_reports_desc) }
+        )
+        manager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_SOUND_ID,
+                context.getString(R.string.channel_reports_sound),
+                NotificationManager.IMPORTANCE_DEFAULT, // default sound
+            ).apply { description = context.getString(R.string.channel_reports_desc) }
+        )
     }
 
     @SuppressLint("MissingPermission") // checked with canNotify() before calling
-    private fun post(context: Context, reports: List<Pair<Period, Report>>) {
-        ensureChannel(context)
+    private fun post(context: Context, reports: List<Pair<Period, Report>>, withSound: Boolean) {
+        ensureChannels(context)
         val lines = reports.map { (period, report) -> sectionText(context, period, report) }
 
         // Tap opens the biggest period of this notification (month > week > day)
@@ -94,14 +106,14 @@ object ReportNotifier {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, if (withSound) CHANNEL_SOUND_ID else CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_title))
             .setContentText(lines.first())
             .setStyle(NotificationCompat.BigTextStyle().bigText(lines.joinToString("\n\n")))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(if (withSound) NotificationCompat.PRIORITY_DEFAULT else NotificationCompat.PRIORITY_LOW)
             .build()
 
         try {

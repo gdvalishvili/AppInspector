@@ -125,8 +125,7 @@
     <string name="sort_size">ზომით</string>
     <string name="show_size">ზომის ჩვენება</string>
     <string name="show_description">აღწერის ჩვენება</string>
-    <string name="label_week">7 დღე</string>
-    <string name="label_size">ზომა</string>
+    <string name="label_week">გამოყენება 7 დღეში</string>    <string name="label_size">ზომა</string>
     <string name="label_description">აღწერა</string>
     <string name="size_detail">%1$s (აპი %2$s · მონაცემები %3$s)</string>
     <string name="value_loading">იტვირთება…</string>
@@ -269,4 +268,7 @@
     <string name="logs_select_hint">სხვა ხაზზე გრძელი დაჭერა მონიშნავს ყველაფერს შუალედში</string>
     <string name="logs_copy_too_large">კოპირებისთვის ტექსტი ძალიან დიდია. გამოიყენე „გაზიარება“ ან „შენახვა“.</string>
     <string name="list_refresh">განახლება</string>
+    <string name="channel_reports_sound">გამოყენების რეპორტები (ხმით)</string>
+    <string name="settings_sound">ხმით შეტყობინება</string>
+    <string name="settings_sound_desc">რეპორტის შეტყობინებისას ისმის ნაგულისხმევი ხმა</string>
 </resources>

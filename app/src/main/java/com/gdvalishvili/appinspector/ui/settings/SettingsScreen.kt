@@ -128,6 +128,7 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = viewModel(
                 SwitchRow(R.string.settings_monthly, R.string.settings_monthly_desc, s.monthly) { on ->
                     if (on) withNotificationPermission { viewModel.setMonthly(true) } else viewModel.setMonthly(false)
                 }
+                NotificationSoundSetting()
                 ValueRow(
                     title = R.string.settings_time,
                     description = R.string.settings_time_desc,

@@ -168,6 +168,15 @@ class SettingsStore(private val context: Context) {
         PeriodType.MONTH -> LAST_SENT_MONTH
     }
 
+    // ---------- Notification sound ----------
+
+    /** false (default) = silent channel, true = channel with the default sound. */
+    val notifySound: Flow<Boolean> = prefs.map { it[NOTIFY_SOUND] ?: false }
+
+    suspend fun setNotifySound(value: Boolean) {
+        context.settingsDataStore.edit { it[NOTIFY_SOUND] = value }
+    }
+
     // ---------- Usage collection ----------
 
     /** Last calendar day (ISO yyyy-MM-dd) whose usage is stored in daily_usage. */
@@ -204,5 +213,6 @@ class SettingsStore(private val context: Context) {
         val USAGE_ALGORITHM_VERSION = intPreferencesKey("usage_algorithm_version")
         val SHOW_SIZE = booleanPreferencesKey("show_size")
         val SHOW_DESCRIPTION = booleanPreferencesKey("show_description")
+        val NOTIFY_SOUND = booleanPreferencesKey("notify_sound")
     }
 }
