@@ -117,6 +117,13 @@ fun AppListScreen(
                     }
                 },
                 actions = {
+                    // Manual reload: same as returning to the app (list, history, 7-day usage, sizes)
+                    IconButton(onClick = viewModel::refresh, enabled = !state.isLoading) {
+                        Icon(
+                            painterResource(R.drawable.ic_refresh),
+                            contentDescription = stringResource(R.string.list_refresh),
+                        )
+                    }
                     IconButton(onClick = onOpenReport) {
                         Icon(
                             painterResource(R.drawable.ic_bar_chart),

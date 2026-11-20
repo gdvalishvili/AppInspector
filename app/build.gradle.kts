@@ -1,10 +1,25 @@
 import java.util.Properties
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.BuiltArtifactsLoader
+import java.io.File
 
 // Signing data lives outside Git (keystore.properties in the project root)
 val keystoreProperties = Properties().apply {
     val file = rootProject.file("keystore.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }
+
+// App version: edit only version.properties (project root).
+// versionName = "MAJOR.MINOR.PATCH", versionCode = MAJOR*10000 + MINOR*100 + PATCH (e.g. 3.1.0 -> 30100)
+val versionProperties = Properties().apply {
+    rootProject.file("version.properties").inputStream().use { load(it) }
+}
+val versionMajor = versionProperties.getProperty("MAJOR").trim().toInt()
+val versionMinor = versionProperties.getProperty("MINOR").trim().toInt()
+val versionPatch = versionProperties.getProperty("PATCH").trim().toInt()
+require(versionMinor in 0..99 && versionPatch in 0..99) { "MINOR and PATCH must be 0-99 in version.properties" }
+val appVersionName = "$versionMajor.$versionMinor.$versionPatch"
+val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
 
 plugins {
     alias(libs.plugins.android.application)
@@ -23,8 +38,8 @@ android {
         applicationId = "com.gdvalishvili.appinspector"
         minSdk = 26
         targetSdk = 37
-        versionCode = 19
-        versionName = "3.0.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -97,4 +112,52 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.glance.appwidget)
+}
+
+// ---- Named copy of the release APK: build/outputs/named_apk/release/AppInspector-<version>-release.apk ----
+// AGP 9 no longer allows renaming the original APK; this copies it when the APK is built.
+abstract class CopyNamedApk : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val input: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val output: DirectoryProperty
+
+    @get:Internal
+    abstract val builtArtifactsLoader: Property<BuiltArtifactsLoader>
+
+    @get:Input
+    abstract val appName: Property<String>
+
+    @get:Input
+    abstract val buildTypeName: Property<String>
+
+    @TaskAction
+    fun copy() {
+        val outDir = output.get().asFile
+        outDir.deleteRecursively()
+        outDir.mkdirs()
+        val artifacts = builtArtifactsLoader.get().load(input.get())
+            ?: throw GradleException("Cannot load APKs")
+        artifacts.elements.forEach { apk ->
+            val version = apk.versionName ?: "unknown"
+            val target = File(outDir, "${appName.get()}-$version-${buildTypeName.get()}.apk")
+            File(apk.outputFile).copyTo(target, overwrite = true)
+            logger.lifecycle("Named APK: $target")
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        val copyTask = tasks.register<CopyNamedApk>("copyNamedApkFor${variant.name}") {
+            appName.set("AppInspector")
+            buildTypeName.set(variant.buildType ?: variant.name)
+            output.set(layout.buildDirectory.dir("outputs/named_apk/${variant.name}"))
+            builtArtifactsLoader.set(variant.artifacts.getBuiltArtifactsLoader())
+        }
+        // Runs automatically whenever the release APK is created
+        variant.artifacts.use(copyTask).wiredWith { it.input }.toListenTo(SingleArtifact.APK)
+    }
 }

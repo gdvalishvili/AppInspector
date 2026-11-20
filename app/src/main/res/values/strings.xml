@@ -279,4 +279,5 @@
     <string name="logs_select_visible">All visible</string>
     <string name="logs_select_hint">Long-press another line to select everything in between</string>
     <string name="logs_copy_too_large">Too much text to copy. Use Share or Save instead.</string>
+    <string name="list_refresh">Refresh</string>
 </resources>

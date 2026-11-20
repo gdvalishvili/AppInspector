@@ -268,4 +268,5 @@
     <string name="logs_select_visible">ყველა ხილული</string>
     <string name="logs_select_hint">სხვა ხაზზე გრძელი დაჭერა მონიშნავს ყველაფერს შუალედში</string>
     <string name="logs_copy_too_large">კოპირებისთვის ტექსტი ძალიან დიდია. გამოიყენე „გაზიარება“ ან „შენახვა“.</string>
+    <string name="list_refresh">განახლება</string>
 </resources>
