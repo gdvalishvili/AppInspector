@@ -4,7 +4,7 @@ A personal Android app that shows what is installed on the phone, how each app i
 
 Built for my own Google Pixel 9 Pro XL. **It is not published on Google Play.** The app works fully offline: it has **no INTERNET permission**, and all data stays on the device.
 
-> Status: **v3.1.0** · Android 8.0+ (minSdk 26) · targetSdk 37 · Georgian / English UI
+> Status: **v3.2.0** · Android 8.0+ (minSdk 26) · targetSdk 37 · Georgian / English UI
 
 ---
 
@@ -59,6 +59,15 @@ Built for my own Google Pixel 9 Pro XL. **It is not published on Google Play.** 
 - Details screen: a "Background" block with the same data and manifest capabilities (starts on boot, exact alarms, wake lock, foreground service types)
 - Cleanup: unused apps that still run in the background are marked with ⚠
 - Short background jobs (WorkManager/JobScheduler) and battery use per app are not available to normal apps
+## Privacy (3.2.0)
+- Scans installed APKs on the phone (no internet permission, nothing leaves the device) and matches class names against the Exodus Privacy tracker list (`app/src/main/assets/trackers.json`).
+- A tracker found in the code means the SDK is included, not proof that it sends data.
+- Risk level = trackers (max 4 points) + sensitive permissions/access; "high" needs both.
+- Background data history: table `daily_network` (day, package, background/foreground bytes), filled daily and when the Privacy screen opens. Retention is set in Settings (default 2 years).
+- Tracker data: © Exodus Privacy, licensed under ODbL v1.0 (https://exodus-privacy.eu.org).
+
+## Database
+- Room version 2. Schema files are in `app/schemas/` and must be committed (needed for future migrations).
 
 ### Home screen widget
 - Today's screen time and the top 3 apps with icons (Jetpack Glance)

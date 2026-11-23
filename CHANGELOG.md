@@ -2,7 +2,25 @@
 
 All notable changes to App Inspector. Versions follow `MAJOR.MINOR.PATCH`; `-alphaN` builds were test steps on the way to a release.
 
-## [3.1.0] - unreleased
+## [3.2.0] - 2026-11-24
+### Added
+- Privacy screen: offline tracker scan of installed APKs (Exodus Privacy database, 428 trackers, ODbL 1.0).
+- Risk level (low / medium / high) with reasons; high requires trackers plus sensitive access.
+- Filters (all / high / with trackers / no trackers), optional system apps, link to Android Privacy settings.
+- CSV export (`;` separator, UTF-8 BOM) including background data for 7 and 30 days.
+- App details: privacy section with single-app scan.
+- Daily background data history per app (Wi-Fi + mobile), kept 2 years by default (1 / 2 / 5 years / forever in Settings).
+- Privacy list sort by background data (30 days); 30-day background data chart in app details.
+- Cleanup: warning for high-risk apps.
+- Main list: pull-to-refresh.
+
+### Changed
+- Database version 2 (Room auto-migration 1 → 2, new table `daily_network`); existing data is kept.
+
+### Fixed
+- Scanning one app or a subset no longer deletes other apps' cached scan results.
+
+## [3.1.0] - 2026-11-20.
 Background activity.
 
 ### Added
