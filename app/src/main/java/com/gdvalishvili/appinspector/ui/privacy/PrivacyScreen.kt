@@ -2,6 +2,7 @@ package com.gdvalishvili.appinspector.ui.privacy
 
 import android.content.Intent
 import android.provider.Settings
+import android.text.format.Formatter
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,12 +67,12 @@ import com.gdvalishvili.appinspector.util.AppIcons
 import com.gdvalishvili.appinspector.util.formatDateTime
 import com.gdvalishvili.appinspector.util.openAppInfo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.Collator
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 
 enum class PrivacyFilter { ALL, HIGH, WITH_TRACKERS, NO_TRACKERS }
+enum class PrivacySort { RISK, BACKGROUND_30 }
 
 private data class PrivacyRow(val app: AppEntry, val result: PrivacyResult)
 
@@ -84,6 +86,7 @@ fun PrivacyScreen(
 ) {
     val results by viewModel.results.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
+    val bg30 by viewModel.bg30.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val levelNames = mapOf(
@@ -92,6 +95,7 @@ fun PrivacyScreen(
         RiskLevel.HIGH to stringResource(R.string.pv_level_high),
     )
     var filter by rememberSaveable { mutableStateOf(PrivacyFilter.ALL) }
+    var sort by rememberSaveable { mutableStateOf(PrivacySort.RISK) }
     var includeSystem by rememberSaveable { mutableStateOf(false) }
 
     // Only this profile is scanned; system apps only when the switch is on
@@ -102,14 +106,20 @@ fun PrivacyScreen(
     }
     LaunchedEffect(apps) { apps?.let { viewModel.loadCached(it.filter { a -> a.profile == AppProfile.THIS }) } }
 
-    val rows = remember(results, targets) {
+    val rows = remember(results, targets, sort, bg30) {
         val map = results.orEmpty()
-        targets.mapNotNull { app -> map[app.key]?.let { PrivacyRow(app, it) } }
-            .sortedWith(
+        val list = targets.mapNotNull { app -> map[app.key]?.let { PrivacyRow(app, it) } }
+        when (sort) {
+            PrivacySort.RISK -> list.sortedWith(
                 compareByDescending<PrivacyRow> { it.result.risk.level.ordinal }
                     .thenByDescending { it.result.risk.score }
                     .thenBy(Collator.getInstance()) { it.app.label }
             )
+            PrivacySort.BACKGROUND_30 -> list.sortedWith(
+                compareByDescending<PrivacyRow> { bg30[it.app.packageName] ?: 0L }
+                    .thenBy(Collator.getInstance()) { it.app.label }
+            )
+        }
     }
     val counts = PrivacyFilter.entries.associateWith { f -> rows.count { it.matches(f) } }
     val visible = rows.filter { it.matches(filter) }
@@ -164,12 +174,12 @@ fun PrivacyScreen(
                                 modifier = Modifier.padding(top = 4.dp),
                             )
                         }
+                        if (rows.isNotEmpty() && progress == null) {
+                            TextButton(onClick = {
+                                scope.launch { exportPrivacyCsv(context, visible.map { it.app to it.result }, levelNames, bg30) }
+                            }) { Text(stringResource(R.string.pv_export)) }
+                        }
                         TextButton(onClick = { openPrivacySettings(context) }) {
-                            if (rows.isNotEmpty() && progress == null) {
-                                TextButton(onClick = {
-                                    scope.launch { exportPrivacyCsv(context, visible.map { it.app to it.result }, levelNames) }
-                                }) { Text(stringResource(R.string.pv_export)) }
-                            }
                             Text(stringResource(R.string.pv_dashboard))
                         }
                     }
@@ -200,6 +210,22 @@ fun PrivacyScreen(
                     )
                 }
             }
+            item {
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    PrivacySort.entries.forEach { s ->
+                        FilterChip(
+                            selected = sort == s,
+                            onClick = { sort = s },
+                            label = {
+                                Text(stringResource(if (s == PrivacySort.RISK) R.string.pv_sort_risk else R.string.pv_sort_bg30))
+                            },
+                        )
+                    }
+                }
+            }
             when {
                 results == null -> item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
                 rows.isEmpty() -> Unit // the card above explains what to do
@@ -213,6 +239,7 @@ fun PrivacyScreen(
                 else -> items(visible, key = { it.app.key }) { row ->
                     PrivacyRowItem(
                         row = row,
+                        bg30 = if (sort == PrivacySort.BACKGROUND_30) bg30[row.app.packageName] ?: 0L else null,
                         onClick = { onOpenDetails(row.app.key) },
                         onLongClick = { openAppInfo(context, row.app) },
                     )
@@ -246,9 +273,11 @@ private fun openPrivacySettings(context: android.content.Context) {
     }
 }
 
+/** bg30 != null: also show the 30-day background data line (when sorted by it). */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun PrivacyRowItem(row: PrivacyRow, onClick: () -> Unit, onLongClick: () -> Unit) {
+private fun PrivacyRowItem(row: PrivacyRow, bg30: Long?, onClick: () -> Unit, onLongClick: () -> Unit) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -267,6 +296,13 @@ private fun PrivacyRowItem(row: PrivacyRow, onClick: () -> Unit, onLongClick: ()
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (bg30 != null) {
+                Text(
+                    stringResource(R.string.pv_bg30_line, Formatter.formatShortFileSize(context, bg30)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
             if (row.result.skippedDex > 0) {
                 Text(stringResource(R.string.pv_partial), style = MaterialTheme.typography.labelSmall)
             }

@@ -380,4 +380,12 @@
     <string name="pv_c_analytics">app usage events, screens, device model, OS version</string>
     <string name="pv_c_crash">crash reports, device model, OS version</string>
     <string name="pv_cleanup_high">🔒⚠ High privacy risk</string>
+    <string name="settings_net_retention">Keep background data history</string>
+    <string name="settings_net_years">%1$d y</string>
+    <string name="settings_net_forever">Forever</string>
+    <string name="pv_sort_risk">Risk</string>
+    <string name="pv_sort_bg30">Background data (30 days)</string>
+    <string name="pv_bg30_line">Background data in 30 days: %1$s</string>
+    <string name="bg_history_title">Background data, 30 days: %1$s (max %2$s on %3$s)</string>
+    <string name="bg_history_empty">No background data history yet</string>
 </resources>

@@ -177,6 +177,15 @@ class SettingsStore(private val context: Context) {
         context.settingsDataStore.edit { it[NOTIFY_SOUND] = value }
     }
 
+    // ---------- Background data history ----------
+
+    /** Years to keep daily_network rows; 0 = forever. Default 2 (separate from usage retention). */
+    val networkRetentionYears: Flow<Int> = prefs.map { it[NETWORK_RETENTION_YEARS] ?: 2 }
+
+    suspend fun setNetworkRetentionYears(value: Int) {
+        context.settingsDataStore.edit { it[NETWORK_RETENTION_YEARS] = value }
+    }
+
     // ---------- Usage collection ----------
 
     /** Last calendar day (ISO yyyy-MM-dd) whose usage is stored in daily_usage. */
@@ -214,5 +223,6 @@ class SettingsStore(private val context: Context) {
         val SHOW_SIZE = booleanPreferencesKey("show_size")
         val SHOW_DESCRIPTION = booleanPreferencesKey("show_description")
         val NOTIFY_SOUND = booleanPreferencesKey("notify_sound")
+        val NETWORK_RETENTION_YEARS = intPreferencesKey("network_retention_years")
     }
 }

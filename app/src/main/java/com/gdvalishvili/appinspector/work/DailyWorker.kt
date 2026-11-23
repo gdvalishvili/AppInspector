@@ -29,6 +29,11 @@ class DailyWorker(appContext: Context, params: WorkerParameters) :
         AppHistoryRepository(context).sync(snapshot.apps, snapshot.workProfile)
         UsageCollector(context).collectMissingDays()
         ReportNotifier.sendDueReports(context)
+        try {
+            com.gdvalishvili.appinspector.data.background.NetworkHistory(applicationContext).collect()
+        } catch (e: Exception) {
+            // Network history must never break the daily job
+        }
         UsageWidgetUpdater.refreshAll(applicationContext)
         Result.success()
     } catch (e: Exception) {

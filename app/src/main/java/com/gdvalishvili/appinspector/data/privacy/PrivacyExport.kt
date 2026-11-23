@@ -10,6 +10,7 @@ data class ExportRow(
     val categories: List<String>,
     val permissions: List<String>,
     val backgroundMb7d: Long,
+    val backgroundMb30d: Long,
     val scannedAt: String,
 )
 
@@ -19,7 +20,7 @@ object PrivacyExport {
     private const val SEP = ";"
     private const val BOM = "\uFEFF" // tells Excel the file is UTF-8 (Georgian text)
     private val HEADER = listOf(
-        "app", "package", "level", "score", "trackers", "tracker_categories", "permissions", "background_MB_7d", "scanned_at",
+        "app", "package", "level", "score", "trackers", "tracker_categories", "permissions", "background_MB_7d", "background_MB_30d", "scanned_at",
     )
 
     fun csv(rows: List<ExportRow>): String = buildString {
@@ -30,7 +31,7 @@ object PrivacyExport {
                 listOf(
                     r.app, r.packageName, r.level, r.score.toString(),
                     r.trackers.joinToString(", "), r.categories.joinToString(", "), r.permissions.joinToString(", "),
-                    r.backgroundMb7d.toString(), r.scannedAt,
+                    r.backgroundMb7d.toString(),r.backgroundMb30d.toString(), r.scannedAt,
                 ).joinToString(SEP) { escape(it) }
             ).append("\r\n")
         }

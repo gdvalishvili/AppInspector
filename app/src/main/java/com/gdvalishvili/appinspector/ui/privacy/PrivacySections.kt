@@ -134,7 +134,7 @@ fun rememberHighRiskPackages(apps: List<AppEntry>?): Set<String> {
 }
 
 /** Builds the CSV of the given rows and opens the share sheet. */
-suspend fun exportPrivacyCsv(context: Context, rows: List<Pair<AppEntry, PrivacyResult>>, levelNames: Map<RiskLevel, String>) {
+suspend fun exportPrivacyCsv(context: Context, rows: List<Pair<AppEntry, PrivacyResult>>, levelNames: Map<RiskLevel, String>, bg30: Map<String, Long>) {
     val csv = PrivacyExport.csv(
         rows.map { (app, r) ->
             ExportRow(
@@ -146,6 +146,7 @@ suspend fun exportPrivacyCsv(context: Context, rows: List<Pair<AppEntry, Privacy
                 categories = r.trackers.flatMap { it.categories }.distinct(),
                 permissions = r.grantedSensitive.map { it.substringAfterLast('.') }.sorted(),
                 backgroundMb7d = r.backgroundBytes7d / (1024 * 1024),
+                backgroundMb30d = (bg30[app.packageName] ?: 0L) / (1024 * 1024),
                 scannedAt = formatDateTime(r.scannedAt),
             )
         }

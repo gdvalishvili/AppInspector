@@ -82,6 +82,7 @@ fun BackgroundDetailsSection(app: AppEntry, modifier: Modifier = Modifier) {
                                 if (net.sharedUid) text + " · " + stringResource(R.string.bg_shared_uid) else text
                             } else stringResource(R.string.bg_details_no_data)
                         )
+                        NetworkHistoryBlock(app.packageName)
                         val bucket = snap.buckets[app.packageName]
                         Line(
                             if (bucket != null) stringResource(R.string.bg_details_bucket, stringResource(bucketLabel(bucket)))

@@ -11,11 +11,11 @@ class PrivacyExportTest {
     @Test
     fun headerAndRow() {
         val csv = PrivacyExport.csv(
-            listOf(ExportRow("ჩემი აპი", "com.a", "მაღალი", 7, listOf("AdMob", "Facebook Ads"), listOf("Advertisement"), listOf("RECORD_AUDIO"), 120, "23.11.2026 23:40"))
+            listOf(ExportRow("ჩემი აპი", "com.a", "მაღალი", 7, listOf("AdMob", "Facebook Ads"), listOf("Advertisement"), listOf("RECORD_AUDIO"), 120,900, "23.11.2026 23:40"))
         )
         assertTrue(csv.startsWith("\uFEFFapp;package;level;score;"))
         val line = csv.lines()[1]
-        assertEquals("ჩემი აპი;com.a;მაღალი;7;AdMob, Facebook Ads;Advertisement;RECORD_AUDIO;120;23.11.2026 23:40", line.trimEnd('\r'))
+        assertEquals("ჩემი აპი;com.a;მაღალი;7;AdMob, Facebook Ads;Advertisement;RECORD_AUDIO;120;900;23.11.2026 23:40", line.trimEnd('\r'))
     }
 
     @Test

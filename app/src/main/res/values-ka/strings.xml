@@ -368,4 +368,12 @@
     <string name="pv_c_analytics">აპის გამოყენების მოვლენები, ეკრანები, მოწყობილობის მოდელი, OS ვერსია</string>
     <string name="pv_c_crash">ავარიის რეპორტები, მოწყობილობის მოდელი, OS ვერსია</string>
     <string name="pv_cleanup_high">🔒⚠ კონფიდენციალურობის მაღალი რისკი</string>
+    <string name="settings_net_retention">ფონური ინტერნეტის ისტორიის შენახვა</string>
+    <string name="settings_net_years">%1$d წ</string>
+    <string name="settings_net_forever">სამუდამოდ</string>
+    <string name="pv_sort_risk">რისკი</string>
+    <string name="pv_sort_bg30">ფონური ინტერნეტი (30 დღე)</string>
+    <string name="pv_bg30_line">ფონური ინტერნეტი 30 დღეში: %1$s</string>
+    <string name="bg_history_title">ფონური ინტერნეტი 30 დღეში: %1$s (მაქს. %2$s, %3$s)</string>
+    <string name="bg_history_empty">ფონური ინტერნეტის ისტორია ჯერ არ არის</string>
 </resources>
