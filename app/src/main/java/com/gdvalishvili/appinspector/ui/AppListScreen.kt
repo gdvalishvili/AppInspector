@@ -84,6 +84,7 @@ fun AppListScreen(
     onOpenCleanup: () -> Unit,
     onOpenLogs: () -> Unit,
     onOpenBackground: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     viewModel: AppListViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -156,6 +157,7 @@ fun AppListScreen(
                         onOpenCleanup = onOpenCleanup,
                         onOpenLogs = onOpenLogs,
                         onOpenBackground = onOpenBackground,
+                        onOpenPrivacy = onOpenPrivacy,
                     )
                 },
             )
@@ -439,6 +441,7 @@ private fun ViewOptionsMenu(
     onOpenCleanup: () -> Unit,
     onOpenLogs: () -> Unit,
     onOpenBackground: () -> Unit,
+    onOpenPrivacy: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -496,6 +499,13 @@ private fun ViewOptionsMenu(
                 onClick = {
                     expanded = false
                     onOpenBackground()
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.pv_title)) },
+                onClick = {
+                    expanded = false
+                    onOpenPrivacy()
                 },
             )
             DropdownMenuItem(

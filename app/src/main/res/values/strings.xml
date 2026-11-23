@@ -325,4 +325,37 @@
     <string name="bg_cap_fgs">foreground service: %1$s</string>
     <string name="bg_details_work">Not available for work profile apps</string>
     <string name="bg_cleanup_warning">⚠ Runs in the background</string>
+    <string name="pv_title">Privacy</string>
+    <string name="pv_intro">Finds known tracker libraries inside each app\'s code (offline) and combines them with granted permissions and background data. A tracker found in the code means the app can collect data, not that it does.</string>
+    <string name="pv_scan">Scan</string>
+    <string name="pv_rescan">Scan new and updated apps</string>
+    <string name="pv_scanning">Scanning %1$d / %2$d</string>
+    <string name="pv_scanned">Checked: %1$d of %2$d apps · last scan %3$s</string>
+    <string name="pv_not_scanned">No scan yet. Tap Scan (the first scan can take 1–3 minutes).</string>
+    <string name="pv_dashboard">Privacy settings (Privacy dashboard)</string>
+    <string name="pv_filter_all">All (%1$d)</string>
+    <string name="pv_filter_high">High risk (%1$d)</string>
+    <string name="pv_filter_trackers">With trackers (%1$d)</string>
+    <string name="pv_filter_clean">No trackers (%1$d)</string>
+    <string name="pv_include_system">System too</string>
+    <string name="pv_empty">No apps in this group</string>
+    <string name="pv_level_low">Low</string>
+    <string name="pv_level_medium">Medium</string>
+    <string name="pv_level_high">High</string>
+    <plurals name="pv_trackers">
+        <item quantity="one">%1$d tracker</item>
+        <item quantity="other">%1$d trackers</item>
+    </plurals>
+    <string name="pv_no_trackers">no trackers found</string>
+    <string name="pv_r_location">location</string>
+    <string name="pv_r_microphone">microphone</string>
+    <string name="pv_r_sms">SMS</string>
+    <string name="pv_r_call_log">call log</string>
+    <string name="pv_r_camera">camera</string>
+    <string name="pv_r_contacts">contacts</string>
+    <string name="pv_r_sensors">body sensors</string>
+    <string name="pv_r_background_data">background data %1$s MB</string>
+    <string name="pv_r_fgs">background %1$s</string>
+    <string name="pv_partial">⚠ part of the code was too big to check</string>
+    <string name="pv_attribution">Tracker data: Exodus Privacy (exodus-privacy.eu.org), ODbL v1.0</string>
 </resources>

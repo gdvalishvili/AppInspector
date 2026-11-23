@@ -35,9 +35,10 @@ import com.gdvalishvili.appinspector.widget.UsageWidgetUpdater
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import com.gdvalishvili.appinspector.ui.background.BackgroundScreen
+import com.gdvalishvili.appinspector.ui.privacy.PrivacyScreen
 
 /** Simple state-based navigation (no navigation library needed). */
-enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP, LOGS, BACKGROUND }
+enum class Screen { LIST, REPORT, SETTINGS, DETAILS, UPDATES, CLEANUP, LOGS, BACKGROUND, PRIVACY    }
 class MainActivity : ComponentActivity() {
 
     /** Period requested by a notification/widget tap (or a chart bar); consumed by the report screen. */
@@ -87,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         onOpenCleanup = { screen = Screen.CLEANUP },
                         onOpenLogs = { openLogs(null, Screen.LIST) },
                         onOpenBackground = { screen = Screen.BACKGROUND },
+                        onOpenPrivacy = { screen = Screen.PRIVACY },
                     )
                     Screen.REPORT -> {
                         BackHandler { screen = Screen.LIST }
@@ -126,6 +128,14 @@ class MainActivity : ComponentActivity() {
                             apps = allApps,
                             onBack = { screen = Screen.LIST },
                             onOpenDetails = { key -> openDetails(key, Screen.BACKGROUND) },
+                        )
+                    }
+                    Screen.PRIVACY -> {
+                        BackHandler { screen = Screen.LIST }
+                        PrivacyScreen(
+                            apps = allApps,
+                            onBack = { screen = Screen.LIST },
+                            onOpenDetails = { key -> openDetails(key, Screen.PRIVACY) },
                         )
                     }
                     Screen.LOGS -> {

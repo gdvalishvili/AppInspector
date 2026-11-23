@@ -121,7 +121,7 @@
     <string name="notif_week">გასული კვირა: %1$s (საშ. %2$s)</string>
     <string name="notif_month">გასული თვე: %1$s (საშ. %2$s)</string>
     <string name="notif_changes"> · +%1$d / −%2$d აპი</string>
-    <string name="sort_most_used">ყველაზე გამოყენებული (7 დღე)</string>
+    <string name="sort_most_used">ხშირად გამოყენებული (7 დღე)</string>
     <string name="sort_size">ზომით</string>
     <string name="show_size">ზომის ჩვენება</string>
     <string name="show_description">აღწერის ჩვენება</string>
@@ -313,4 +313,37 @@
     <string name="bg_cap_fgs">foreground service: %1$s</string>
     <string name="bg_details_work">work profile-ის აპებისთვის არ არის ხელმისაწვდომი</string>
     <string name="bg_cleanup_warning">⚠ ფონზე მუშაობს</string>
+    <string name="pv_title">კონფიდენციალურობა</string>
+    <string name="pv_intro">ეძებს ცნობილ tracker ბიბლიოთეკებს თითოეული აპის კოდში (ინტერნეტის გარეშე) და აერთიანებს გაცემულ ნებართვებთან და ფონურ ინტერნეტთან. კოდში ნაპოვნი tracker ნიშნავს, რომ აპს მონაცემების შეგროვება შეუძლია, და არა იმას, რომ აგროვებს.</string>
+    <string name="pv_scan">სკანირება</string>
+    <string name="pv_rescan">ახალი და განახლებული აპების სკანირება</string>
+    <string name="pv_scanning">მოწმდება %1$d / %2$d</string>
+    <string name="pv_scanned">შემოწმებულია: %1$d / %2$d აპი · ბოლო სკანირება %3$s</string>
+    <string name="pv_not_scanned">სკანირება ჯერ არ ყოფილა. დააჭირე „სკანირებას“ (პირველი 1–3 წუთი გრძელდება).</string>
+    <string name="pv_dashboard">კონფიდენციალურობის პარამეტრები (Privacy dashboard)</string>
+    <string name="pv_filter_all">ყველა (%1$d)</string>
+    <string name="pv_filter_high">მაღალი რისკი (%1$d)</string>
+    <string name="pv_filter_trackers">tracker-ით (%1$d)</string>
+    <string name="pv_filter_clean">tracker-ის გარეშე (%1$d)</string>
+    <string name="pv_include_system">სისტემურიც</string>
+    <string name="pv_empty">ამ ჯგუფში აპი არ არის</string>
+    <string name="pv_level_low">დაბალი</string>
+    <string name="pv_level_medium">საშუალო</string>
+    <string name="pv_level_high">მაღალი</string>
+    <plurals name="pv_trackers">
+        <item quantity="one">%1$d tracker</item>
+        <item quantity="other">%1$d tracker</item>
+    </plurals>
+    <string name="pv_no_trackers">tracker არ მოიძებნა</string>
+    <string name="pv_r_location">მდებარეობა</string>
+    <string name="pv_r_microphone">მიკროფონი</string>
+    <string name="pv_r_sms">SMS</string>
+    <string name="pv_r_call_log">ზარების ისტორია</string>
+    <string name="pv_r_camera">კამერა</string>
+    <string name="pv_r_contacts">კონტაქტები</string>
+    <string name="pv_r_sensors">სხეულის სენსორები</string>
+    <string name="pv_r_background_data">ფონური ინტერნეტი %1$s MB</string>
+    <string name="pv_r_fgs">ფონური %1$s</string>
+    <string name="pv_partial">⚠ კოდის ნაწილი შესამოწმებლად ძალიან დიდი იყო</string>
+    <string name="pv_attribution">Tracker-ების მონაცემები: Exodus Privacy (exodus-privacy.eu.org), ODbL v1.0</string>
 </resources>
