@@ -50,3 +50,39 @@ fun shortSummary(result: PrivacyResult): String {
     if (other.isNotEmpty()) parts += other.joinToString(", ")
     return parts.joinToString(" · ")
 }
+
+/** Points label for a reason. */
+@Composable
+fun reasonLine(r: com.gdvalishvili.appinspector.data.privacy.RiskReason): String {
+    val points = stringResource(R.string.pv_points, r.points)
+    val name = when (r.kind) {
+        ReasonKind.TRACKER_ADS -> stringResource(R.string.pv_k_ads) + ": " + r.detail
+        ReasonKind.TRACKER_PROFILING -> stringResource(R.string.pv_k_profiling) + ": " + r.detail
+        ReasonKind.TRACKER_LOCATION -> stringResource(R.string.pv_k_location) + ": " + r.detail
+        ReasonKind.TRACKER_IDENTIFICATION -> stringResource(R.string.pv_k_identification) + ": " + r.detail
+        ReasonKind.TRACKER_ANALYTICS -> stringResource(R.string.pv_k_analytics) + ": " + r.detail
+        ReasonKind.PERM_LOCATION -> stringResource(R.string.pv_r_location)
+        ReasonKind.PERM_MICROPHONE -> stringResource(R.string.pv_r_microphone)
+        ReasonKind.PERM_SMS -> stringResource(R.string.pv_r_sms)
+        ReasonKind.PERM_CALL_LOG -> stringResource(R.string.pv_r_call_log)
+        ReasonKind.PERM_CAMERA -> stringResource(R.string.pv_r_camera)
+        ReasonKind.PERM_CONTACTS -> stringResource(R.string.pv_r_contacts)
+        ReasonKind.PERM_SENSORS -> stringResource(R.string.pv_r_sensors)
+        ReasonKind.BACKGROUND_DATA -> stringResource(R.string.pv_r_background_data, r.detail)
+        ReasonKind.FGS_SENSITIVE -> stringResource(R.string.pv_r_fgs, r.detail)
+    }
+    return "• $name $points"
+}
+
+/** What this kind of tracker usually collects (by its strongest category). */
+@Composable
+fun typicalCollection(categories: List<String>): String = stringResource(
+    when {
+        "Advertisement" in categories -> R.string.pv_c_ads
+        "Profiling" in categories -> R.string.pv_c_profiling
+        "Location" in categories -> R.string.pv_c_location
+        "Identification" in categories -> R.string.pv_c_identification
+        "Analytics" in categories -> R.string.pv_c_analytics
+        else -> R.string.pv_c_crash
+    }
+)

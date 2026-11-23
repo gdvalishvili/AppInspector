@@ -358,4 +358,26 @@
     <string name="pv_r_fgs">background %1$s</string>
     <string name="pv_partial">⚠ part of the code was too big to check</string>
     <string name="pv_attribution">Tracker data: Exodus Privacy (exodus-privacy.eu.org), ODbL v1.0</string>
+    <string name="pv_export">Export (CSV)</string>
+    <string name="pv_details_title">Privacy</string>
+    <string name="pv_details_level">Risk: %1$s (%2$d points)</string>
+    <string name="pv_details_not_scanned">Not scanned yet</string>
+    <string name="pv_details_scan">Scan this app</string>
+    <string name="pv_details_disclaimer">Found in the app\'s code: the app can collect this data. Whether and when it sends it cannot be seen without a network monitor (e.g. TrackerControl).</string>
+    <string name="pv_details_trackers">Trackers (%1$d)</string>
+    <string name="pv_details_collects">Usually collects: %1$s</string>
+    <string name="pv_k_ads">Advertising trackers</string>
+    <string name="pv_k_profiling">Profiling trackers</string>
+    <string name="pv_k_location">Location trackers</string>
+    <string name="pv_k_identification">Identification trackers</string>
+    <string name="pv_k_analytics">Analytics trackers</string>
+    <string name="pv_points">(+%1$d)</string>
+    <string name="pv_trackers_capped">Trackers count at most %1$d points in total</string>
+    <string name="pv_c_ads">advertising ID, device model and settings, app usage, approximate location</string>
+    <string name="pv_c_profiling">app usage and behavior, interests, identifiers to link you across apps</string>
+    <string name="pv_c_location">precise or approximate location, Wi-Fi and cell data</string>
+    <string name="pv_c_identification">device and advertising identifiers, account identifiers</string>
+    <string name="pv_c_analytics">app usage events, screens, device model, OS version</string>
+    <string name="pv_c_crash">crash reports, device model, OS version</string>
+    <string name="pv_cleanup_high">🔒⚠ High privacy risk</string>
 </resources>

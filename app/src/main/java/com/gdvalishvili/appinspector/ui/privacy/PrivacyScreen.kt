@@ -67,6 +67,8 @@ import com.gdvalishvili.appinspector.util.openAppInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.Collator
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 enum class PrivacyFilter { ALL, HIGH, WITH_TRACKERS, NO_TRACKERS }
 
@@ -83,6 +85,12 @@ fun PrivacyScreen(
     val results by viewModel.results.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val levelNames = mapOf(
+        RiskLevel.LOW to stringResource(R.string.pv_level_low),
+        RiskLevel.MEDIUM to stringResource(R.string.pv_level_medium),
+        RiskLevel.HIGH to stringResource(R.string.pv_level_high),
+    )
     var filter by rememberSaveable { mutableStateOf(PrivacyFilter.ALL) }
     var includeSystem by rememberSaveable { mutableStateOf(false) }
 
@@ -157,6 +165,11 @@ fun PrivacyScreen(
                             )
                         }
                         TextButton(onClick = { openPrivacySettings(context) }) {
+                            if (rows.isNotEmpty() && progress == null) {
+                                TextButton(onClick = {
+                                    scope.launch { exportPrivacyCsv(context, visible.map { it.app to it.result }, levelNames) }
+                                }) { Text(stringResource(R.string.pv_export)) }
+                            }
                             Text(stringResource(R.string.pv_dashboard))
                         }
                     }

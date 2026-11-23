@@ -74,4 +74,20 @@ class RiskRulesTest {
         assertEquals("location", r.reasons.first { it.kind == ReasonKind.FGS_SENSITIVE }.detail)
         assertEquals(0, RiskRules.evaluate(input(bg = 10L * 1024 * 1024, fgs = listOf("dataSync"))).score)
     }
+    @Test
+    fun trackersAloneAreAtMostMedium() {
+        val many = (1..6).map { tracker("Ad$it", "Advertisement") }
+        val r = RiskRules.evaluate(input(trackers = many))
+        assertEquals(RiskLevel.MEDIUM, r.level)
+        assertEquals(RiskRules.TRACKER_CAP, r.score)
+    }
+
+    @Test
+    fun permissionsWithoutTrackersAreNotHigh() {
+        val r = RiskRules.evaluate(
+            input(perms = setOf("android.permission.ACCESS_FINE_LOCATION", "android.permission.RECORD_AUDIO", "android.permission.READ_SMS"))
+        )
+        assertEquals(6, r.score)
+        assertEquals(RiskLevel.MEDIUM, r.level)
+    }
 }

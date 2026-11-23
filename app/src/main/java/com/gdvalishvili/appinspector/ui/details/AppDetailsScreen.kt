@@ -73,6 +73,7 @@ import com.gdvalishvili.appinspector.util.requestUninstall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import com.gdvalishvili.appinspector.ui.privacy.PrivacyDetailsSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,6 +128,7 @@ fun AppDetailsScreen(
                 item { InfoSection(app, current) }
                 // Foreground services, background data, bucket, battery, capabilities
                 item { BackgroundDetailsSection(app) }
+                item { PrivacyDetailsSection(app) }
                 current.permissions?.let { permissions -> item { PermissionsSection(permissions) } }
                 if (current.events.isNotEmpty()) item { HistorySection(current.events) }
             }

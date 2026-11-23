@@ -24,6 +24,7 @@ data class PrivacyResult(
     val risk: RiskResult,
     val skippedDex: Int,   // > 0: part of the code was too big to check
     val scannedAt: Long,
+    val backgroundBytes7d: Long,
 )
 
 /**
@@ -85,13 +86,15 @@ class PrivacyRepository(private val context: Context) {
                 val risk = RiskRules.evaluate(
                     RiskInput(found, granted, network[app.packageName]?.backgroundBytes ?: 0L, fgsTypes)
                 )
-                out[app.key] = PrivacyResult(app.packageName, found, granted, risk, entry.skippedDex, entry.scannedAt)
-            }
+                out[app.key] = PrivacyResult(
+                    app.packageName, found, granted, risk, entry.skippedDex, entry.scannedAt,
+                    backgroundBytes7d = network[app.packageName]?.backgroundBytes ?: 0L,
+                )            }
         }
         onProgress?.invoke(targets.size, targets.size)
         if (changed) {
-            val installed = targets.mapTo(HashSet()) { it.packageName }
-            cache.write(entries.filterKeys { it in installed }) // forget uninstalled apps
+            // Keep entries of apps not scanned this time; forget only apps that are really gone
+            cache.write(entries.filterKeys { packageInfo(it) != null })
         }
         return out
     }

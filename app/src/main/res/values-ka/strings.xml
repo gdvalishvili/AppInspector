@@ -346,4 +346,26 @@
     <string name="pv_r_fgs">ფონური %1$s</string>
     <string name="pv_partial">⚠ კოდის ნაწილი შესამოწმებლად ძალიან დიდი იყო</string>
     <string name="pv_attribution">Tracker-ების მონაცემები: Exodus Privacy (exodus-privacy.eu.org), ODbL v1.0</string>
+    <string name="pv_export">ექსპორტი (CSV)</string>
+    <string name="pv_details_title">კონფიდენციალურობა</string>
+    <string name="pv_details_level">რისკი: %1$s (%2$d ქულა)</string>
+    <string name="pv_details_not_scanned">ჯერ არ არის შემოწმებული</string>
+    <string name="pv_details_scan">ამ აპის სკანირება</string>
+    <string name="pv_details_disclaimer">ნაპოვნია აპის კოდში: აპს ამ მონაცემების შეგროვება შეუძლია. აგზავნის თუ არა და როდის, ქსელის მონიტორის (მაგ. TrackerControl) გარეშე არ ჩანს.</string>
+    <string name="pv_details_trackers">Tracker-ები (%1$d)</string>
+    <string name="pv_details_collects">ჩვეულებრივ აგროვებს: %1$s</string>
+    <string name="pv_k_ads">რეკლამის tracker-ები</string>
+    <string name="pv_k_profiling">პროფილირების tracker-ები</string>
+    <string name="pv_k_location">მდებარეობის tracker-ები</string>
+    <string name="pv_k_identification">იდენტიფიკაციის tracker-ები</string>
+    <string name="pv_k_analytics">ანალიტიკის tracker-ები</string>
+    <string name="pv_points">(+%1$d)</string>
+    <string name="pv_trackers_capped">tracker-ები ჯამში მაქსიმუმ %1$d ქულად ითვლება</string>
+    <string name="pv_c_ads">სარეკლამო ID, მოწყობილობის მოდელი და პარამეტრები, აპის გამოყენება, მიახლოებითი მდებარეობა</string>
+    <string name="pv_c_profiling">აპის გამოყენება და ქცევა, ინტერესები, იდენტიფიკატორები სხვა აპებთან დასაკავშირებლად</string>
+    <string name="pv_c_location">ზუსტი ან მიახლოებითი მდებარეობა, Wi-Fi და ფიჭური ქსელის მონაცემები</string>
+    <string name="pv_c_identification">მოწყობილობის და სარეკლამო იდენტიფიკატორები, ანგარიშის იდენტიფიკატორები</string>
+    <string name="pv_c_analytics">აპის გამოყენების მოვლენები, ეკრანები, მოწყობილობის მოდელი, OS ვერსია</string>
+    <string name="pv_c_crash">ავარიის რეპორტები, მოწყობილობის მოდელი, OS ვერსია</string>
+    <string name="pv_cleanup_high">🔒⚠ კონფიდენციალურობის მაღალი რისკი</string>
 </resources>

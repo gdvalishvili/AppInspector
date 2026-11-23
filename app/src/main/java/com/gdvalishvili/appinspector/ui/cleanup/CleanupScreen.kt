@@ -78,6 +78,7 @@ import kotlinx.coroutines.withContext
 import java.text.Collator
 import java.util.concurrent.TimeUnit
 import com.gdvalishvili.appinspector.ui.background.rememberBackgroundActivePackages
+import com.gdvalishvili.appinspector.ui.privacy.rememberHighRiskPackages
 
 enum class CleanupSort { SIZE, LAST_USED, NAME }
 
@@ -127,6 +128,7 @@ fun CleanupScreen(
     }
     val visible = remember(grouped, group, sort, sizes) { sortCleanup(grouped?.get(group).orEmpty(), sort, sizes) }
     val backgroundActive = rememberBackgroundActivePackages(apps)
+    val highRisk = rememberHighRiskPackages(apps)
     val noAccess = apps?.any { it.usageStatus == UsageStatus.NO_PERMISSION } == true
     val selectable = group != CleanupGroup.EXCLUDED && run == null
     val visiblePackages = visible.map { it.packageName }.toSet()
@@ -257,6 +259,7 @@ fun CleanupScreen(
                         app = app,
                         sizeBytes = sizes[app.packageName],
                         backgroundActive = app.packageName in backgroundActive,
+                        highRisk = app.packageName in highRisk,
                         selectable = selectable,
                         selected = app.packageName in selected,
                         isExcludedGroup = group == CleanupGroup.EXCLUDED,
@@ -410,6 +413,7 @@ private fun CleanupRow(
     app: AppEntry,
     sizeBytes: Long?,
     backgroundActive: Boolean,
+    highRisk: Boolean,
     selectable: Boolean,
     selected: Boolean,
     isExcludedGroup: Boolean,
@@ -455,6 +459,13 @@ private fun CleanupRow(
                 if (backgroundActive) {
                     Text(
                         text = stringResource(R.string.bg_cleanup_warning),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                if (highRisk) {
+                    Text(
+                        text = stringResource(R.string.pv_cleanup_high),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error,
                     )
