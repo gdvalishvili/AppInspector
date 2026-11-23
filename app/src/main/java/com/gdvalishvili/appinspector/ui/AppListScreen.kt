@@ -73,6 +73,8 @@ import com.gdvalishvili.appinspector.util.AppLanguage
 import com.gdvalishvili.appinspector.util.categoryTitle
 import com.gdvalishvili.appinspector.util.openAppInfo
 import com.gdvalishvili.appinspector.util.openStorePage
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +93,9 @@ fun AppListScreen(
     val languageChosen by viewModel.languageChosen.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val currentLanguage = LocalConfiguration.current.locales[0].language
+    // Pull-to-refresh: the round indicator is shown only for a manual pull (not for auto refresh on resume)
+    var pullRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(state.isLoading) { if (!state.isLoading) pullRefreshing = false }
 
     // Reload whenever the screen comes back (e.g. after enabling Usage access)
     LifecycleResumeEffect(Unit) {
@@ -230,11 +235,20 @@ fun AppListScreen(
                     CircularProgressIndicator()
                 }
             } else {
-                AppList(
-                    state = state,
-                    onClick = { app -> openAppInfo(context, app) },
-                    onLongClick = { app -> onOpenDetails(app.key) },
-                )
+                PullToRefreshBox(
+                    isRefreshing = pullRefreshing,
+                    onRefresh = {
+                        pullRefreshing = true
+                        viewModel.refresh()
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    AppList(
+                        state = state,
+                        onClick = { app -> openAppInfo(context, app) },
+                        onLongClick = { app -> onOpenDetails(app.key) },
+                    )
+                }
             }
         }
     }
